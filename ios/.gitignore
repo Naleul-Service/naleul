@@ -1,0 +1,19 @@
+# Xcode
+.DS_Store
+*.xcuserstate
+xcuserdata/
+DerivedData/
+*.pbxuser
+*.mode1v2
+*.mode2v2
+*.perspectivev3
+
+# 민감한 설정 파일
+Config.xcconfig
+Secrets.swift
+naleul/naleul/Core/Config.swift
+naleul/naleul/Info.plist
+
+# SPM
+.build/
+*.resolved

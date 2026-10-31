@@ -1,0 +1,42 @@
+# Gradle
+.gradle/
+build/
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# macOS
+.DS_Store
+
+# 환경변수 파일 (DB 비밀번호 등 민감 정보 - 절대 올리면 안됨)
+.env
+*.env
+application-local.properties
+application-secret.properties
+application
+
+# 로그
+*.log
+logs/
+
+# 컴파일된 파일
+*.class
+
+# 패키지 파일
+*.jar
+*.war
+src/main/resources/firebase-service-account.json
+
+*.yml
+!.github/**/*.yml
+current_schema.sql
+
+# 로컬 인수인계 파일
+naleul_context.zip
+
+# *.yml 무시 규칙의 예외: GitHub Actions 워크플로는 커밋되어야 함
+!.github/workflows/*.yml

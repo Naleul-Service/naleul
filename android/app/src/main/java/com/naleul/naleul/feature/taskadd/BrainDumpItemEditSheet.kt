@@ -1,0 +1,620 @@
+// feature/taskadd/BrainDumpItemEditSheet.kt
+//
+// iOS Features/TaskAdd/BrainDumpItemEditSheet.swift
+// 웹 원본: features/brain-dump/ui/ItemEditModal.tsx
+//
+// 2단계 "변경" — 목표·세부 목표·마일스톤·날짜·시간·소요 시간·중요도를 고쳐요.
+// 웹 Modal → 아래에서 올라오는 시트(SheetScaffold), 웹 <select> → 드롭다운 메뉴(BrainDumpMenuField),
+// <input type=date/time> → 머티리얼 날짜 · 시각 선택 창.
+//
+// Android 에서 바꾼 점
+//  - 시트로 띄워지는 화면이라 onDismiss 를 받아서 시트를 직접 그려요 (부르는 쪽은 if 로만 띄우면 돼요).
+//  - 저장하면 onSave 를 부른 뒤 시트를 애니메이션으로 닫아요 (닫히고 나면 onDismiss).
+
+package com.naleul.naleul.feature.taskadd
+
+import com.naleul.naleul.app.*
+import com.naleul.naleul.core.analytics.*
+import com.naleul.naleul.core.network.*
+import com.naleul.naleul.core.state.*
+import com.naleul.naleul.core.util.*
+import com.naleul.naleul.designsystem.*
+import com.naleul.naleul.model.*
+import com.naleul.naleul.feature.auth.*
+import com.naleul.naleul.feature.calendar.*
+import com.naleul.naleul.feature.calendarimport.*
+import com.naleul.naleul.feature.goal.*
+import com.naleul.naleul.feature.goalcreation.*
+import com.naleul.naleul.feature.habit.*
+import com.naleul.naleul.feature.home.*
+import com.naleul.naleul.feature.notifications.*
+import com.naleul.naleul.feature.pattern.*
+import com.naleul.naleul.feature.record.*
+import com.naleul.naleul.feature.settings.*
+import com.naleul.naleul.feature.taskadd.*
+import com.naleul.naleul.feature.work.*
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Text
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+
+/** 목표 선택 값: "g12" (기존 목표) / "t:t1" (이번에 만드는 임시 목표) / "__new__" (새 임시 목표) / "" (안 고름) */
+private const val newTempValue = "__new__"
+
+/** 선택 값 → goal_match (existing / temp / new_temp / none) */
+private fun editGoalMatch(sel: String): String = when {
+    sel == newTempValue -> "new_temp"
+    sel.startsWith("g") -> "existing"
+    sel.startsWith("t:") -> "temp"
+    else -> "none"
+}
+
+@Composable
+fun BrainDumpItemEditSheet(
+    item: BrainDumpMapItem,
+    goals: List<GoalCategory>,
+    tempGoals: List<TempGoalInput>,
+    today: String,
+    nextTempKey: String,
+    canAddTemp: Boolean,
+    /** 새 임시 목표를 만들었으면 newTemp 도 같이 */
+    onSave: (BrainDumpMapItem, TempGoalInput?) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    // 고치는 중인 값 (iOS @State f) — 시트가 열릴 때 item 으로 시작해요
+    var f by remember(item.clientKey) { mutableStateOf(item) }
+    var goalSel by remember(item.clientKey) {
+        mutableStateOf(
+            when {
+                item.goalCategoryId != null -> "g${item.goalCategoryId}"
+                item.tempGoalKey != null -> "t:${item.tempGoalKey}"
+                else -> ""
+            }
+        )
+    }
+    var newTempName by remember { mutableStateOf("") }
+    var newTempEmoji by remember { mutableStateOf("📌") }
+    /** 처음 값 (changed_fields · is_dirty 비교용) */
+    val initialGoalSel = remember(item.clientKey) { goalSel }
+    /** "saved" · "cancel_button" — 없으면 X(sheetCloseHint) 또는 쓸어 닫기 · 뒤로 가기 */
+    val outcome = remember { mutableStateOf<String?>(null) }
+
+    // MARK: 앰플리튜드
+
+    /** 처음 값과 달라진 칸 (웹 changedFieldsOf 와 같은 이름) */
+    fun changedFields(): List<String> {
+        val a = item
+        val b = f
+        val out = mutableListOf<String>()
+        if (a.title.trim() != b.title.trim()) out.add("name")
+        if (a.generalCategoryId != b.generalCategoryId) out.add("topic")
+        if (a.workTopicId != b.workTopicId) out.add("work_topic")
+        if (a.dateType != b.dateType || (b.dateType == DateType.ON && a.scheduledDate != b.scheduledDate)) out.add("date")
+        if (b.dateType == DateType.DUE && a.dueDate != b.dueDate) out.add("due_date")
+        if (goalSel != initialGoalSel || a.milestoneId != b.milestoneId) out.add("goal")
+        if (a.startTime != b.startTime || a.endTime != b.endTime) out.add("time")
+        if ((a.estimatedMinutes ?: 30) != (b.estimatedMinutes ?: 30)) out.add("duration")
+        if ((a.priority ?: TaskPriority.C) != (b.priority ?: TaskPriority.C)) out.add("priority")
+        if ((a.kind ?: TaskKind.NORMAL) != (b.kind ?: TaskKind.NORMAL)) out.add("appointment")
+        return out
+    }
+
+    fun isDirty(): Boolean = changedFields().isNotEmpty() || (goalSel == newTempValue && newTempName.isNotBlank())
+
+    LaunchedEffect(Unit) {
+        // 임시 목표가 이미 5개라 "+ 새 임시 목표 만들기"가 빠진 채 열림
+        if (!canAddTemp) TA.track("task_add_item_edit.temp_limit_view", mapOf("temp_count" to tempGoals.size))
+    }
+    DisposableEffect(Unit) {
+        onDispose {
+            val m = GD.closeMethod(outcome.value) ?: return@onDispose
+            TA.track("task_add_item_edit.close", mapOf("close_method" to m, "is_dirty" to isDirty()))
+        }
+    }
+
+    // MARK: 계산 값
+
+    val goal: GoalCategory? = if (goalSel.startsWith("g")) goals.firstOrNull { "g${it.goalCategoryId}" == goalSel } else null
+    /** 세부 목표 (삭제된 것 · "기타 할 일" 그릇은 빼요 — 그릇은 "선택 안 함"과 같아요) */
+    val subGoals: List<SubGoalInfo> = (goal?.generalCategories ?: emptyList())
+        .filter { it.generalCategoryStatus != GoalStatus.DELETED && !(it.defaultBucket ?: false) }
+    val milestones: List<MilestoneInfo> = (goal?.milestones ?: emptyList()).filter { it.status == MilestoneStatus.PENDING }
+    val date: String? = if (f.dateType == DateType.DUE) f.dueDate else f.scheduledDate
+
+    val timeInvalid: Boolean = run {
+        val s = f.startTime
+        val e = f.endTime
+        if (s == null || e == null) false else e <= s
+    }
+    val valid: Boolean = f.title.trim().isNotEmpty() &&
+        goalSel.isNotEmpty() &&
+        (goalSel != newTempValue || newTempName.trim().isNotEmpty()) &&
+        (f.dateType == DateType.NONE || date != null) &&
+        !timeInvalid
+
+    val goalText: String = when {
+        goalSel == newTempValue -> "+ 새 임시 목표 만들기"
+        goal != null -> (goal.emoji?.let { "$it " } ?: "") + goal.goalCategoryName
+        goalSel.startsWith("t:") -> {
+            val tk = goalSel.drop(2)
+            tempGoals.firstOrNull { it.tempKey == tk }?.let { t -> (t.emoji?.let { "$it " } ?: "") + t.name } ?: "목표를 골라 주세요"
+        }
+        else -> "목표를 골라 주세요"
+    }
+
+    // MARK: 동작
+
+    /** 종료 시각을 처음 채울 땐 시작 + 1시간 */
+    val endDefault: String = f.startTime?.let { s -> KST.minutesToTime(minOf(KST.timeToMinutes(s) + 60, 23 * 60 + 50)) } ?: "10:00"
+
+    fun selectGoal(value: String) {
+        TA.track("task_add_item_edit.goal_select", mapOf("goal_match" to editGoalMatch(value)))
+        goalSel = value
+        f = f.copy(generalCategoryId = null, milestoneId = null, workTopicId = null)
+    }
+
+    fun setDateType(t: DateType) {
+        TA.track("task_add_item_edit.date_type_select", mapOf("date_type" to t.name))
+        val d = date
+        f = f.copy(
+            dateType = t,
+            scheduledDate = if (t == DateType.ON) (d ?: today) else null,
+            dueDate = if (t == DateType.DUE) (d ?: today) else null,
+            startTime = if (t != DateType.ON) null else f.startTime,
+            endTime = if (t != DateType.ON) null else f.endTime,
+        )
+    }
+
+    fun setDate(d: String) {
+        f = if (f.dateType == DateType.DUE) f.copy(dueDate = d) else f.copy(scheduledDate = d)
+    }
+
+    /** 저장이 막힌 이유 (흐린 저장을 눌렀을 때) */
+    val blockedReason: String? = when {
+        f.title.isBlank() -> "no_title"
+        goalSel.isEmpty() -> "no_goal"
+        goalSel == newTempValue && newTempName.isBlank() -> "blank_temp"
+        f.dateType != DateType.NONE && date == null -> "no_date"
+        timeInvalid -> "time_order"
+        else -> null
+    }
+
+    fun save(close: () -> Unit) {
+        if (!valid) return
+        TA.track("task_add_item_edit.save_click", mapOf(
+            "changed_fields" to changedFields().joinToString(","),
+            "goal_match" to editGoalMatch(goalSel),
+            "date_type" to f.dateType.name,
+            "has_time" to (f.dateType == DateType.ON && f.startTime != null),
+            "time_dropped" to (f.dateType == DateType.ON && f.startTime == null && f.endTime != null),
+        ))
+        outcome.value = "saved"
+        val base = f.copy(title = f.title.trim())
+        when {
+            goalSel == newTempValue -> {
+                val emoji = newTempEmoji.ifEmpty { null }
+                val temp = TempGoalInput(
+                    tempKey = nextTempKey,
+                    name = newTempName.trim().take(30),
+                    emoji = emoji,
+                    colorId = null,
+                )
+                onSave(base.copy(goalCategoryId = null, generalCategoryId = null, milestoneId = null, workTopicId = null, tempGoalKey = temp.tempKey), temp)
+            }
+            goalSel.startsWith("t:") -> {
+                onSave(base.copy(goalCategoryId = null, generalCategoryId = null, milestoneId = null, workTopicId = null, tempGoalKey = goalSel.drop(2)), null)
+            }
+            else -> {
+                onSave(base.copy(goalCategoryId = goalSel.drop(1).toIntOrNull(), tempGoalKey = null), null)
+            }
+        }
+        close()
+    }
+
+    SheetScaffold(
+        onDismiss = onDismiss,
+        title = "Task 변경",
+        fullHeight = true,
+        footer = { close ->
+            NButton("취소", variant = NButtonVariant.secondary) {
+                outcome.value = "cancel_button"
+                close()
+            }
+            NButton(
+                "저장", enabled = valid,
+                modifier = Modifier.disabledTap(!valid) {
+                    blockedReason?.let { TA.track("task_add_item_edit.save_blocked", mapOf("disabled_reason" to it)) }
+                },
+            ) { save(close) }
+        },
+    ) {
+        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+            // 할 일
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                EditLabel("할 일")
+                NTextField(
+                    value = f.title,
+                    onValueChange = { v -> f = f.copy(title = v.take(100)) },
+                    maxLength = 100,
+                    modifier = Modifier.semantics { contentDescription = "할 일 이름" },
+                )
+            }
+
+            // 목표
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                EditLabel("목표")
+                BrainDumpMenuField(text = goalText, isPlaceholder = goalSel.isEmpty()) {
+                    if (goals.isNotEmpty()) {
+                        Section("내 목표") {
+                            for (g in goals) {
+                                Button((g.emoji?.let { "$it " } ?: "") + g.goalCategoryName) { selectGoal("g${g.goalCategoryId}") }
+                            }
+                        }
+                    }
+                    if (tempGoals.isNotEmpty()) {
+                        Section("이번에 만드는 임시 목표") {
+                            for (t in tempGoals) {
+                                Button((t.emoji?.let { "$it " } ?: "") + t.name) { selectGoal("t:${t.tempKey}") }
+                            }
+                        }
+                    }
+                    if (canAddTemp) {
+                        Button("+ 새 임시 목표 만들기") { selectGoal(newTempValue) }
+                    }
+                }
+            }
+
+            // 새 임시 목표
+            if (goalSel == newTempValue) {
+                Column(
+                    Modifier
+                        .fillMaxWidth()
+                        .background(NC.subtle, RoundedCornerShape(Radius.xl))
+                        .padding(12.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+                        EmojiField(
+                            emoji = newTempEmoji,
+                            onEmojiChange = { newTempEmoji = it },
+                            modifier = Modifier.semantics { contentDescription = "임시 목표 이모지" },
+                        )
+                        NTextField(
+                            value = newTempName,
+                            onValueChange = { newTempName = it.take(30) },
+                            placeholder = "예) 이사 준비",
+                            maxLength = 30,
+                            modifier = Modifier.weight(1f).semantics { contentDescription = "임시 목표 이름" },
+                        )
+                    }
+                    Text(
+                        "임시 목표는 나중에 AI 목표 만들기로 구체화할 수 있어요. 무료 목표 개수에 포함되지 않아요.",
+                        style = pt(12),
+                        color = NC.ink3,
+                    )
+                }
+            }
+
+            // 업무형 목표: 세부 목표 대신 주제 (2026-10)
+            val isWork = goal?.isWorkGoal == true
+            if (goal != null && isWork) {
+                WorkTopicEditField(goalId = goal.goalCategoryId, value = f.workTopicId) { f = f.copy(workTopicId = it) }
+            }
+            // 세부 목표 · 마일스톤
+            if (goal != null && ((!isWork && subGoals.isNotEmpty()) || milestones.isNotEmpty())) {
+                if (!isWork && subGoals.isNotEmpty()) {
+                    val current = subGoals.firstOrNull { it.generalCategoryId == f.generalCategoryId }
+                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                        EditLabel("세부 목표")
+                        BrainDumpMenuField(text = current?.generalCategoryName ?: "선택 안 함 (기타 할 일)", isPlaceholder = false) {
+                            Button("선택 안 함 (기타 할 일)") { f = f.copy(generalCategoryId = null) }
+                            for (c in subGoals) {
+                                Button(c.generalCategoryName) { f = f.copy(generalCategoryId = c.generalCategoryId) }
+                            }
+                        }
+                    }
+                }
+                if (milestones.isNotEmpty()) {
+                    val current = milestones.firstOrNull { it.milestoneId == f.milestoneId }
+                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                        EditLabel("마일스톤")
+                        BrainDumpMenuField(text = current?.let { "🏁 ${it.title}" } ?: "선택 안 함", isPlaceholder = false) {
+                            Button("선택 안 함") { f = f.copy(milestoneId = null) }
+                            for (m in milestones) {
+                                Button("🏁 ${m.title}") { f = f.copy(milestoneId = m.milestoneId) }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // 날짜
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                EditLabel("날짜")
+                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    NChip("그날 하기", selected = f.dateType == DateType.ON, size = ChipSize.sm) { setDateType(DateType.ON) }
+                    NChip("그날까지", selected = f.dateType == DateType.DUE, size = ChipSize.sm) { setDateType(DateType.DUE) }
+                    NChip("날짜 없음", selected = f.dateType == DateType.NONE, size = ChipSize.sm) { setDateType(DateType.NONE) }
+                }
+                if (f.dateType != DateType.NONE) {
+                    val current = date ?: today
+                    NDateField(
+                        ymd = current,
+                        onYmdChange = { setDate(it) },
+                        // 이미 지난 날짜가 들어 있으면 그 날부터 고를 수 있게 (iOS min(current, today))
+                        minDate = minOf(current, today),
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                } else {
+                    Text("빈 시간이 있는 가까운 날에 알아서 배치해요.", style = pt(12), color = NC.ink3)
+                }
+            }
+
+            // 시간 (그날 하기일 때만)
+            if (f.dateType == DateType.ON) {
+                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    EditLabel("시간 (선택)")
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        BrainDumpTimeField(
+                            value = f.startTime,
+                            onValueChange = { v -> f = f.copy(startTime = v) },
+                            label = "시작 시각",
+                            defaultValue = "09:00",
+                            wide = true,
+                            modifier = Modifier.weight(1f),
+                        )
+                        BrainDumpTimeField(
+                            value = f.endTime,
+                            onValueChange = { v -> f = f.copy(endTime = v) },
+                            label = "종료 시각",
+                            defaultValue = endDefault,
+                            wide = true,
+                            modifier = Modifier.weight(1f),
+                        )
+                    }
+                    Text(
+                        if (timeInvalid) "종료 시각이 시작 시각보다 늦어야 해요."
+                        else "시간을 정하면 그 시간에 고정돼요. 비워 두면 AI가 빈 시간에 놓아요.",
+                        style = pt(12),
+                        color = if (timeInvalid) NC.danger else NC.ink3,
+                    )
+                }
+            }
+
+            // 예상 소요 시간
+            run {
+                val current = f.estimatedMinutes ?: 30
+                val options = (BrainDumpConst.editMinutes + current).toSortedSet().toList()
+                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    EditLabel("예상 소요 시간")
+                    BrainDumpMenuField(text = BrainDumpConst.minutesLabel(current), isPlaceholder = false) {
+                        for (m in options) {
+                            Button(BrainDumpConst.minutesLabel(m)) { f = f.copy(estimatedMinutes = m) }
+                        }
+                    }
+                }
+            }
+
+            // 중요도
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                EditLabel("중요도")
+                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                    for (p in TaskPriority.entries) {
+                        NChip(
+                            p.rawValue,
+                            selected = (f.priority ?: TaskPriority.C) == p,
+                            size = ChipSize.sm,
+                            modifier = Modifier.semantics { contentDescription = "중요도 ${p.rawValue} ${BrainDumpConst.priorityHint(p)}" },
+                        ) { f = f.copy(priority = p) }
+                    }
+                }
+            }
+
+            // 약속
+            val on = f.kind == TaskKind.APPOINTMENT
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .clickable(role = Role.Checkbox) { f = f.copy(kind = if (on) TaskKind.NORMAL else TaskKind.APPOINTMENT) },
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                SfImage(if (on) "checkmark.square.fill" else "square", size = 16.dp, tint = if (on) NC.textBrand else NC.ink4)
+                Text(
+                    "다른 사람과 정한 약속이에요 (중요도가 올라가요)",
+                    style = pt(14),
+                    color = NC.ink,
+                    modifier = Modifier.weight(1f),
+                )
+            }
+        }
+    }
+}
+
+/** 칸 위 작은 라벨 */
+@Composable
+private fun EditLabel(s: String) {
+    Text(s, style = pt(12, PTWeight.medium), color = NC.ink3)
+}
+
+// MARK: - 고르기 칸 (웹 <select>)
+
+/**
+ * BrainDumpMenuField 의 메뉴 내용을 적는 곳. iOS Menu { Button(…) { } ; Section(…) { } } 와 같은 모양으로 써요.
+ *
+ *   BrainDumpMenuField(text = "목표 없이", isPlaceholder = false) {
+ *       Button("목표 없이") { selected = null }
+ *       for (g in goals) Button(g.goalCategoryName) { selected = g.goalCategoryId }
+ *   }
+ *
+ * 항목을 누르면 메뉴가 먼저 닫히고 action 이 불려요.
+ */
+class BrainDumpMenuScope(private val dismiss: () -> Unit) {
+    /** 메뉴 항목 하나 (iOS Button(title) { action }) */
+    @Composable
+    fun Button(title: String, action: () -> Unit) {
+        NDropdownMenuItem(
+            text = { Text(title, style = pt(15), color = NC.ink, maxLines = 1, overflow = TextOverflow.Ellipsis) },
+            onClick = {
+                dismiss()
+                action()
+            },
+        )
+    }
+
+    /** 제목 있는 묶음 (iOS Section("제목") { … }) */
+    @Composable
+    fun Section(title: String, content: @Composable BrainDumpMenuScope.() -> Unit) {
+        Text(
+            title,
+            style = pt(12, PTWeight.semibold),
+            color = NC.ink3,
+            modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 4.dp),
+        )
+        content()
+        HorizontalDivider(color = NC.borderSoft, modifier = Modifier.padding(vertical = 4.dp))
+    }
+
+    companion object {}
+}
+
+/** 입력칸 모양의 버튼 — 누르면 목록(드롭다운 메뉴)이 떠요 */
+@Composable
+fun BrainDumpMenuField(
+    text: String,
+    isPlaceholder: Boolean,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    content: @Composable BrainDumpMenuScope.() -> Unit,
+) {
+    var open by remember { mutableStateOf(false) }
+    val scope = remember { BrainDumpMenuScope(dismiss = { open = false }) }
+    val shape = RoundedCornerShape(Radius.xl)
+    Box(modifier.fillMaxWidth()) {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .height(44.dp)
+                .clip(shape)
+                .background(NC.surface, shape)
+                .border(1.dp, NC.borderSubtle, shape)
+                .clickable(enabled = enabled, role = Role.Button) { open = true }
+                .padding(horizontal = 12.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text,
+                style = pt(15),
+                color = if (isPlaceholder) NC.ink4 else NC.ink,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f),
+            )
+            SfImage("chevron.up.chevron.down", size = 12.dp, tint = NC.ink3)
+        }
+        NDropdownMenu(
+            expanded = open,
+            onDismissRequest = { open = false },
+            containerColor = NC.surface,
+            modifier = Modifier.heightIn(max = 420.dp),
+        ) {
+            scope.content()
+        }
+    }
+}
+
+/** 항목 목록(MenuItem)으로 부르는 모양 — 아이콘 · 비활성 항목이 필요할 때 */
+@Composable
+fun BrainDumpMenuField(
+    text: String,
+    isPlaceholder: Boolean,
+    items: List<MenuItem>,
+    modifier: Modifier = Modifier,
+) {
+    BrainDumpMenuField(text = text, isPlaceholder = isPlaceholder, modifier = modifier) {
+        for (item in items) {
+            Button(item.title) { if (item.enabled) item.action() }
+        }
+    }
+}
+
+@Preview(showBackground = true, heightDp = 900)
+@Composable
+private fun BrainDumpItemEditSheetPreview() {
+    NaleulTheme(dark = false) {
+        val today = KST.today()
+        BrainDumpItemEditSheet(
+            item = TaskAddSample.items(today)[0],
+            goals = TaskAddSample.goals(),
+            tempGoals = listOf(TempGoalInput(tempKey = "t1", name = "이사 준비", emoji = "📦", colorId = null)),
+            today = today,
+            nextTempKey = "t2",
+            canAddTemp = true,
+            onSave = { _, _ -> },
+            onDismiss = {},
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun BrainDumpMenuFieldPreview() {
+    NaleulTheme(dark = false) {
+        Box(Modifier.padding(16.dp)) {
+            BrainDumpMenuField(text = "💪 3개월 5kg 감량", isPlaceholder = false) {
+                Button("목표 없이") {}
+            }
+        }
+    }
+}
+
+/** 업무형 목표의 주제 (웹 ItemEditModal WorkTopicField) — 끝내지 않은 주제 · 비우면 주제 없음 */
+@Composable
+private fun WorkTopicEditField(goalId: Int, value: Int?, onChange: (Int?) -> Unit) {
+    var topics by remember(goalId) { mutableStateOf<List<WorkTopic>?>(null) }
+    LaunchedEffect(goalId) {
+        topics = try {
+            WorkAPI.board(goalId = goalId)?.topics ?: emptyList()
+        } catch (c: kotlinx.coroutines.CancellationException) {
+            throw c
+        } catch (_: Exception) {
+            emptyList()
+        }
+    }
+    val choices = (topics ?: emptyList()).filter { it.topicId != null && (!it.completed || it.topicId == value) }
+    val label = { t: WorkTopic -> listOfNotNull(t.emoji, t.name).joinToString(" ") }
+    val current = choices.firstOrNull { it.topicId == value }
+    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        EditLabel("세부 목표")
+        BrainDumpMenuField(
+            text = current?.let(label) ?: if (topics == null) "불러오는 중…" else "선택 안 함 (기타 할 일)",
+            isPlaceholder = false,
+            enabled = topics != null,
+        ) {
+            Button("선택 안 함 (기타 할 일)") { onChange(null) }
+            for (t in choices) {
+                Button(label(t)) { onChange(t.topicId) }
+            }
+        }
+        if (topics != null && choices.isEmpty()) {
+            Text("아직 세부 목표가 없어요. 목표 상세의 로드맵에서 세부 목표를 만들 수 있어요.", style = pt(12), color = NC.ink3)
+        }
+    }
+}

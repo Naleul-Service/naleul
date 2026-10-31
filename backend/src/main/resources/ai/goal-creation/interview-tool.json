@@ -1,0 +1,230 @@
+{
+  "name": "submit_interview_turn",
+  "description": "인터뷰 한 턴의 결과를 제출한다. 사용자 답변에서 새로 알게 된 슬롯 값(extracted), 실행 성향 신호, 다음 행동(ASK/READY/REJECT)과 다음 질문을 담는다. 이유(동기)는 묻지 않는다. 모든 응답은 반드시 이 도구로만 한다.",
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "extracted": {
+        "type": "object",
+        "description": "이번 턴에 새로 알게 됐거나 사용자가 고친 값만. 모르면 null.",
+        "properties": {
+          "goalStatement": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "이루고 싶은 것. 짧은 명사형"
+          },
+          "metric": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "예: 체중"
+              },
+              "currentValue": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "targetValue": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "unit": {
+                "type": "string",
+                "description": "예: kg"
+              }
+            },
+            "required": [
+              "name",
+              "unit"
+            ]
+          },
+          "motivation": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "사용자가 스스로 말한 이유만. 절대 묻지 않는다"
+          },
+          "deadline": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "endDate": {
+                "type": "string",
+                "description": "yyyy-MM-dd"
+              },
+              "isFlexible": {
+                "type": "boolean",
+                "description": "사용자가 기한을 정하지 않아 AI가 제안했으면 true"
+              },
+              "startDate": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "사용자가 시작 시점을 말했으면 yyyy-MM-dd (예: \"10월 29일부터\" → 그 날, \"다음 달부터\" → 다음 달 1일). 말하지 않았으면 null"
+              }
+            },
+            "required": [
+              "endDate",
+              "isFlexible"
+            ]
+          },
+          "approach": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "어떻게 이루고 싶은지 · 정해 둔 계획 · 꼭 할 일 · 기간별 순서 (예: \"2주 이론 강의 → 남은 기간 기출 5회독\"). 정한 게 없으면 \"정한 계획 없음\""
+          },
+          "practicePreference": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "preferredDays": {
+                "type": [
+                  "array",
+                  "null"
+                ],
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "MON",
+                    "TUE",
+                    "WED",
+                    "THU",
+                    "FRI",
+                    "SAT",
+                    "SUN"
+                  ]
+                }
+              },
+              "preferredTimeRanges": {
+                "type": [
+                  "array",
+                  "null"
+                ],
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "start": {
+                      "type": "string",
+                      "description": "HH:mm"
+                    },
+                    "end": {
+                      "type": "string",
+                      "description": "HH:mm"
+                    }
+                  },
+                  "required": [
+                    "start",
+                    "end"
+                  ]
+                }
+              },
+              "unavailableNote": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "workStyleAnswer": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            }
+          },
+          "skippedSlots": {
+            "type": "array",
+            "description": "답할 수 없다고 판단된 선택 슬롯 (예: 수치로 표현할 수 없는 목표면 metric)",
+            "items": {
+              "type": "string",
+              "enum": [
+                "metric",
+                "motivation",
+                "deadline",
+                "approach",
+                "practicePreference"
+              ]
+            }
+          }
+        }
+      },
+      "planningStyleSignal": {
+        "type": "object",
+        "properties": {
+          "style": {
+            "type": "string",
+            "enum": [
+              "PLANNER",
+              "SPONTANEOUS",
+              "UNKNOWN"
+            ]
+          },
+          "evidence": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "style"
+        ]
+      },
+      "nextAction": {
+        "type": "string",
+        "enum": [
+          "ASK",
+          "READY",
+          "REJECT"
+        ]
+      },
+      "targetSlot": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "enum": [
+          "goalStatement",
+          "metric",
+          "deadline",
+          "approach",
+          "practicePreference",
+          null
+        ]
+      },
+      "question": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "description": "ASK일 때 다음 질문. 2문장 이내 해요체"
+      },
+      "quickReplies": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "description": "ASK일 때 2~4개"
+      }
+    },
+    "required": [
+      "extracted",
+      "planningStyleSignal",
+      "nextAction"
+    ]
+  }
+}

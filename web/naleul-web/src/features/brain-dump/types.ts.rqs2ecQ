@@ -1,0 +1,16 @@
+--- dmg_src_features_brain-dump_types.ts.tsx	2026-10-09 05:11:14.905002488 +0000
++++ base_src_features_brain-dump_types.ts	2026-10-09 05:11:13.863002488 +0000
+@@ -110,12 +110,7 @@
+   created: boolean
+   placements: Placement[]
+   movedToOtherDays: Placement[]
+-  unscheduled: {
+-    taskId: number
+-    clientKey: string
+-    title: string
+-    date?: string | null
+-  }[]
++  unscheduled: { taskId: number; clientKey: string; title: string; date?: string | null }[]
+   conflicts: {
+     clientKey: string
+     title: string

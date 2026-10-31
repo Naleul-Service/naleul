@@ -1,0 +1,21 @@
+{
+  "name": "submit_polished_texts",
+  "description": "다듬은 문장을 제출한다. 모든 응답은 반드시 이 도구로만 한다.",
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "items": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "id": { "type": "string", "description": "받은 id 그대로" },
+            "text": { "type": "string", "description": "다듬은 문장" }
+          },
+          "required": ["id", "text"]
+        }
+      }
+    },
+    "required": ["items"]
+  }
+}

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Figma Naleul design system (node 2932:11149) — 자동 변환, 직접 고치지 마세요 -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:pathData="M12 13V2L20 6L12 10"
+        android:strokeColor="#FF000000"
+        android:strokeWidth="1.875"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+    <path
+        android:pathData="M20.561 10.2219C21.0931 11.862 21.1429 13.6205 20.7044 15.2881C20.2659 16.9558 19.3576 18.4623 18.0876 19.6286C16.8175 20.7948 15.2391 21.5717 13.5402 21.8667C11.8413 22.1617 10.0935 21.9625 8.50454 21.2928C6.91562 20.623 5.55254 19.5109 4.57747 18.0888C3.6024 16.6666 3.05639 14.9943 3.0044 13.2708C2.95241 11.5473 3.39662 9.8451 4.28419 8.36677C5.17176 6.88844 6.46532 5.6962 8.01099 4.93188"
+        android:strokeColor="#FF000000"
+        android:strokeWidth="1.875"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+    <path
+        android:pathData="M8.00199 9.99707C7.50089 10.6641 7.17467 11.4459 7.05303 12.2713C6.9314 13.0966 7.01822 13.9393 7.30559 14.7225C7.59296 15.5057 8.07174 16.2046 8.69832 16.7554C9.32489 17.3063 10.0793 17.6916 10.8929 17.8762C11.7065 18.0609 12.5534 18.039 13.3563 17.8127C14.1593 17.5863 14.8929 17.1626 15.4902 16.5802C16.0875 15.9977 16.5296 15.2751 16.7762 14.4781C17.0228 13.6811 17.066 12.8351 16.902 12.0171"
+        android:strokeColor="#FF000000"
+        android:strokeWidth="1.875"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+</vector>

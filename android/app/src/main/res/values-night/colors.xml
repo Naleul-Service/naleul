@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Component_ver.2: bg/canvas · action/primary (다크) -->
+    <color name="canvas">#121820</color>
+    <color name="brand">#167A9C</color>
+</resources>

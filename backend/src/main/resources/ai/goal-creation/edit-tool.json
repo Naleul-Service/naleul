@@ -1,0 +1,46 @@
+{
+  "name": "submit_goal_edit",
+  "description": "실행 중인 목표에 적용할 변경안을 제출한다.",
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "summary": { "type": "string", "description": "무엇을 어떻게 바꾸는지 해요체 한 문장" },
+      "ops": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "UPDATE_GOAL",
+                "ADD_ROUTINE",
+                "UPDATE_ROUTINE",
+                "DELETE_ROUTINE",
+                "ADD_MILESTONE",
+                "UPDATE_MILESTONE",
+                "DELETE_MILESTONE",
+                "ADD_TASK"
+              ]
+            },
+            "targetId": { "type": ["integer", "null"] },
+            "title": { "type": ["string", "null"] },
+            "durationMinutes": { "type": ["integer", "null"] },
+            "days": {
+              "type": ["array", "null"],
+              "items": { "type": "string", "enum": ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"] }
+            },
+            "startTime": { "type": ["string", "null"], "description": "HH:mm" },
+            "description": { "type": ["string", "null"] },
+            "date": { "type": ["string", "null"], "description": "yyyy-MM-dd" },
+            "startValue": { "type": ["number", "null"] },
+            "targetValue": { "type": ["number", "null"] },
+            "areaId": { "type": ["integer", "null"] }
+          },
+          "required": ["type"]
+        }
+      }
+    },
+    "required": ["summary", "ops"]
+  }
+}

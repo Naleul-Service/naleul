@@ -1,0 +1,913 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		810F7C38304A70E4000FB1A1 /* AmplitudeSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 810F7C37304A70E4000FB1A1 /* AmplitudeSwift */; };
+		81AD0B012FF2000000AD0B01 /* GoogleMobileAds in Frameworks */ = {isa = PBXBuildFile; productRef = 81AD0B022FF2000000AD0B01 /* GoogleMobileAds */; };
+		8116C6532FAEF0FB00EC5B5A /* KakaoSDKCommon in Frameworks */ = {isa = PBXBuildFile; productRef = 8116C6522FAEF0FB00EC5B5A /* KakaoSDKCommon */; };
+		8116C6552FAEF10400EC5B5A /* KakaoSDKAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 8116C6542FAEF10400EC5B5A /* KakaoSDKAuth */; };
+		8116C6572FAEF10D00EC5B5A /* KakaoSDKUser in Frameworks */ = {isa = PBXBuildFile; productRef = 8116C6562FAEF10D00EC5B5A /* KakaoSDKUser */; };
+		8150AC3A30064273009B1032 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8150AC3930063E53009B1032 /* GoogleService-Info.plist */; };
+		81AB836F2FDFA16000978DD4 /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 81AB836E2FDFA16000978DD4 /* FirebaseCore */; };
+		81AB83712FDFA16700978DD4 /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 81AB83702FDFA16700978DD4 /* FirebaseMessaging */; };
+		B10000000000000000000006 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B10000000000000000000005 /* WidgetKit.framework */; };
+		B10000000000000000000007 /* NaleulWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = B10000000000000000000004 /* NaleulWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		8116C5F22FAEDC7E00EC5B5A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8116C5D92FAEDC7D00EC5B5A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8116C5E02FAEDC7D00EC5B5A;
+			remoteInfo = naleul;
+		};
+		8116C5FC2FAEDC7E00EC5B5A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8116C5D92FAEDC7D00EC5B5A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8116C5E02FAEDC7D00EC5B5A;
+			remoteInfo = naleul;
+		};
+		B10000000000000000000009 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8116C5D92FAEDC7D00EC5B5A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B1000000000000000000000B;
+			remoteInfo = NaleulWidgetExtension;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		B10000000000000000000008 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				B10000000000000000000007 /* NaleulWidgetExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		8116C5E12FAEDC7D00EC5B5A /* naleul.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = naleul.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		8116C5F12FAEDC7E00EC5B5A /* naleulTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = naleulTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		8116C5FB2FAEDC7E00EC5B5A /* naleulUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = naleulUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		8150AC3930063E53009B1032 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		B10000000000000000000004 /* NaleulWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = NaleulWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		B10000000000000000000005 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		A10000000000000000000004 /* Exceptions for "naleul" folder in "naleul" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Core/Config.xcconfig,
+				Info.plist,
+			);
+			target = 8116C5E02FAEDC7D00EC5B5A /* naleul */;
+		};
+		B10000000000000000000003 /* Exceptions for "NaleulWidget" folder in "NaleulWidgetExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = B1000000000000000000000B /* NaleulWidgetExtension */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		A10000000000000000000001 /* naleul */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				A10000000000000000000004 /* Exceptions for "naleul" folder in "naleul" target */,
+			);
+			path = naleul;
+			sourceTree = "<group>";
+		};
+		A10000000000000000000002 /* naleulTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = naleulTests;
+			sourceTree = "<group>";
+		};
+		A10000000000000000000003 /* naleulUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = naleulUITests;
+			sourceTree = "<group>";
+		};
+		B10000000000000000000001 /* Shared */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		B10000000000000000000002 /* NaleulWidget */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				B10000000000000000000003 /* Exceptions for "NaleulWidget" folder in "NaleulWidgetExtension" target */,
+			);
+			path = NaleulWidget;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		8116C5DE2FAEDC7D00EC5B5A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8116C6532FAEF0FB00EC5B5A /* KakaoSDKCommon in Frameworks */,
+				8116C6552FAEF10400EC5B5A /* KakaoSDKAuth in Frameworks */,
+				810F7C38304A70E4000FB1A1 /* AmplitudeSwift in Frameworks */,
+				81AD0B012FF2000000AD0B01 /* GoogleMobileAds in Frameworks */,
+				81AB83712FDFA16700978DD4 /* FirebaseMessaging in Frameworks */,
+				81AB836F2FDFA16000978DD4 /* FirebaseCore in Frameworks */,
+				8116C6572FAEF10D00EC5B5A /* KakaoSDKUser in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8116C5EE2FAEDC7E00EC5B5A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8116C5F82FAEDC7E00EC5B5A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B1000000000000000000000D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B10000000000000000000006 /* WidgetKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		8116C5D82FAEDC7D00EC5B5A = {
+			isa = PBXGroup;
+			children = (
+				8150AC3930063E53009B1032 /* GoogleService-Info.plist */,
+				A10000000000000000000001 /* naleul */,
+				A10000000000000000000002 /* naleulTests */,
+				B10000000000000000000001 /* Shared */,
+				B10000000000000000000002 /* NaleulWidget */,
+				A10000000000000000000003 /* naleulUITests */,
+				8116C5E22FAEDC7D00EC5B5A /* Products */,
+				B10000000000000000000014 /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		8116C5E22FAEDC7D00EC5B5A /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				8116C5E12FAEDC7D00EC5B5A /* naleul.app */,
+				8116C5F12FAEDC7E00EC5B5A /* naleulTests.xctest */,
+				8116C5FB2FAEDC7E00EC5B5A /* naleulUITests.xctest */,
+				B10000000000000000000004 /* NaleulWidgetExtension.appex */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		B10000000000000000000014 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				B10000000000000000000005 /* WidgetKit.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		8116C5E02FAEDC7D00EC5B5A /* naleul */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 8116C6052FAEDC7E00EC5B5A /* Build configuration list for PBXNativeTarget "naleul" */;
+			buildPhases = (
+				8116C5DD2FAEDC7D00EC5B5A /* Sources */,
+				8116C5DE2FAEDC7D00EC5B5A /* Frameworks */,
+				8116C5DF2FAEDC7D00EC5B5A /* Resources */,
+				B10000000000000000000008 /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				B1000000000000000000000A /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				A10000000000000000000001 /* naleul */,
+				B10000000000000000000001 /* Shared */,
+			);
+			name = naleul;
+			packageProductDependencies = (
+				8116C6522FAEF0FB00EC5B5A /* KakaoSDKCommon */,
+				8116C6542FAEF10400EC5B5A /* KakaoSDKAuth */,
+				8116C6562FAEF10D00EC5B5A /* KakaoSDKUser */,
+				81AB836E2FDFA16000978DD4 /* FirebaseCore */,
+				81AB83702FDFA16700978DD4 /* FirebaseMessaging */,
+				810F7C37304A70E4000FB1A1 /* AmplitudeSwift */,
+				81AD0B022FF2000000AD0B01 /* GoogleMobileAds */,
+			);
+			productName = naleul;
+			productReference = 8116C5E12FAEDC7D00EC5B5A /* naleul.app */;
+			productType = "com.apple.product-type.application";
+		};
+		8116C5F02FAEDC7E00EC5B5A /* naleulTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 8116C6082FAEDC7E00EC5B5A /* Build configuration list for PBXNativeTarget "naleulTests" */;
+			buildPhases = (
+				8116C5ED2FAEDC7E00EC5B5A /* Sources */,
+				8116C5EE2FAEDC7E00EC5B5A /* Frameworks */,
+				8116C5EF2FAEDC7E00EC5B5A /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				8116C5F32FAEDC7E00EC5B5A /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				A10000000000000000000002 /* naleulTests */,
+			);
+			name = naleulTests;
+			productName = naleulTests;
+			productReference = 8116C5F12FAEDC7E00EC5B5A /* naleulTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		8116C5FA2FAEDC7E00EC5B5A /* naleulUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 8116C60B2FAEDC7E00EC5B5A /* Build configuration list for PBXNativeTarget "naleulUITests" */;
+			buildPhases = (
+				8116C5F72FAEDC7E00EC5B5A /* Sources */,
+				8116C5F82FAEDC7E00EC5B5A /* Frameworks */,
+				8116C5F92FAEDC7E00EC5B5A /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				8116C5FD2FAEDC7E00EC5B5A /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				A10000000000000000000003 /* naleulUITests */,
+			);
+			name = naleulUITests;
+			productName = naleulUITests;
+			productReference = 8116C5FB2FAEDC7E00EC5B5A /* naleulUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+		B1000000000000000000000B /* NaleulWidgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B1000000000000000000000F /* Build configuration list for PBXNativeTarget "NaleulWidgetExtension" */;
+			buildPhases = (
+				B1000000000000000000000C /* Sources */,
+				B1000000000000000000000D /* Frameworks */,
+				B1000000000000000000000E /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				B10000000000000000000001 /* Shared */,
+				B10000000000000000000002 /* NaleulWidget */,
+			);
+			name = NaleulWidgetExtension;
+			packageProductDependencies = (
+			);
+			productName = NaleulWidgetExtension;
+			productReference = B10000000000000000000004 /* NaleulWidgetExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		8116C5D92FAEDC7D00EC5B5A /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1600;
+				LastUpgradeCheck = 1600;
+				TargetAttributes = {
+					8116C5E02FAEDC7D00EC5B5A = {
+						CreatedOnToolsVersion = 15.4;
+					};
+					8116C5F02FAEDC7E00EC5B5A = {
+						CreatedOnToolsVersion = 15.4;
+						TestTargetID = 8116C5E02FAEDC7D00EC5B5A;
+					};
+					8116C5FA2FAEDC7E00EC5B5A = {
+						CreatedOnToolsVersion = 15.4;
+						TestTargetID = 8116C5E02FAEDC7D00EC5B5A;
+					};
+					B1000000000000000000000B = {
+						CreatedOnToolsVersion = 16.0;
+					};
+				};
+			};
+			buildConfigurationList = 8116C5DC2FAEDC7D00EC5B5A /* Build configuration list for PBXProject "naleul" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 8116C5D82FAEDC7D00EC5B5A;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				8116C63D2FAEE87C00EC5B5A /* XCRemoteSwiftPackageReference "kakao-ios-sdk" */,
+				81612EA12FDEF20C00D58EE9 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				81AA51C02FF1000000A51C01 /* XCRemoteSwiftPackageReference "Amplitude-Swift" */,
+				81AD0B032FF2000000AD0B01 /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 8116C5E22FAEDC7D00EC5B5A /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				8116C5E02FAEDC7D00EC5B5A /* naleul */,
+				8116C5F02FAEDC7E00EC5B5A /* naleulTests */,
+				8116C5FA2FAEDC7E00EC5B5A /* naleulUITests */,
+				B1000000000000000000000B /* NaleulWidgetExtension */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		8116C5DF2FAEDC7D00EC5B5A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8150AC3A30064273009B1032 /* GoogleService-Info.plist in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8116C5EF2FAEDC7E00EC5B5A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8116C5F92FAEDC7E00EC5B5A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B1000000000000000000000E /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		8116C5DD2FAEDC7D00EC5B5A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8116C5ED2FAEDC7E00EC5B5A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8116C5F72FAEDC7E00EC5B5A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B1000000000000000000000C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		8116C5F32FAEDC7E00EC5B5A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8116C5E02FAEDC7D00EC5B5A /* naleul */;
+			targetProxy = 8116C5F22FAEDC7E00EC5B5A /* PBXContainerItemProxy */;
+		};
+		8116C5FD2FAEDC7E00EC5B5A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8116C5E02FAEDC7D00EC5B5A /* naleul */;
+			targetProxy = 8116C5FC2FAEDC7E00EC5B5A /* PBXContainerItemProxy */;
+		};
+		B1000000000000000000000A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = B1000000000000000000000B /* NaleulWidgetExtension */;
+			targetProxy = B10000000000000000000009 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		8116C6032FAEDC7E00EC5B5A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		8116C6042FAEDC7E00EC5B5A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		8116C6062FAEDC7E00EC5B5A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = naleul/naleul.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 10;
+				DEVELOPMENT_ASSET_PATHS = "";
+				DEVELOPMENT_TEAM = 5576G8DV3W;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = naleul/Info.plist;
+				INFOPLIST_KEY_NSCalendarsFullAccessUsageDescription = "아이폰 캘린더의 일정을 골라 나를의 Task로 가져오기 위해 일정을 읽어요. 캘린더의 일정을 바꾸거나 지우지 않아요.";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "일정 배경화면을 사진 앱에 저장합니다";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.8.2;
+				PRODUCT_BUNDLE_IDENTIFIER = naleul.naleul;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		8116C6072FAEDC7E00EC5B5A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = naleul/naleul.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 10;
+				DEVELOPMENT_ASSET_PATHS = "";
+				DEVELOPMENT_TEAM = 5576G8DV3W;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = naleul/Info.plist;
+				INFOPLIST_KEY_NSCalendarsFullAccessUsageDescription = "아이폰 캘린더의 일정을 골라 나를의 Task로 가져오기 위해 일정을 읽어요. 캘린더의 일정을 바꾸거나 지우지 않아요.";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "일정 배경화면을 사진 앱에 저장합니다";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.8.2;
+				PRODUCT_BUNDLE_IDENTIFIER = naleul.naleul;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		8116C6092FAEDC7E00EC5B5A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 5576G8DV3W;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = naleul.naleulTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/naleul.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/naleul";
+			};
+			name = Debug;
+		};
+		8116C60A2FAEDC7E00EC5B5A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 5576G8DV3W;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = naleul.naleulTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/naleul.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/naleul";
+			};
+			name = Release;
+		};
+		8116C60C2FAEDC7E00EC5B5A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 5576G8DV3W;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = naleul.naleulUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_TARGET_NAME = naleul;
+			};
+			name = Debug;
+		};
+		8116C60D2FAEDC7E00EC5B5A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 5576G8DV3W;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = naleul.naleulUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_TARGET_NAME = naleul;
+			};
+			name = Release;
+		};
+		B10000000000000000000010 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = NaleulWidgetExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 9;
+				DEVELOPMENT_TEAM = 5576G8DV3W;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = NaleulWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "나를";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.8.1;
+				PRODUCT_BUNDLE_IDENTIFIER = naleul.naleul.NaleulWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		B10000000000000000000011 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = NaleulWidgetExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 9;
+				DEVELOPMENT_TEAM = 5576G8DV3W;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = NaleulWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "나를";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.8.1;
+				PRODUCT_BUNDLE_IDENTIFIER = naleul.naleul.NaleulWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		8116C5DC2FAEDC7D00EC5B5A /* Build configuration list for PBXProject "naleul" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8116C6032FAEDC7E00EC5B5A /* Debug */,
+				8116C6042FAEDC7E00EC5B5A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		8116C6052FAEDC7E00EC5B5A /* Build configuration list for PBXNativeTarget "naleul" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8116C6062FAEDC7E00EC5B5A /* Debug */,
+				8116C6072FAEDC7E00EC5B5A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		8116C6082FAEDC7E00EC5B5A /* Build configuration list for PBXNativeTarget "naleulTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8116C6092FAEDC7E00EC5B5A /* Debug */,
+				8116C60A2FAEDC7E00EC5B5A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		8116C60B2FAEDC7E00EC5B5A /* Build configuration list for PBXNativeTarget "naleulUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8116C60C2FAEDC7E00EC5B5A /* Debug */,
+				8116C60D2FAEDC7E00EC5B5A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		B1000000000000000000000F /* Build configuration list for PBXNativeTarget "NaleulWidgetExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B10000000000000000000010 /* Debug */,
+				B10000000000000000000011 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		8116C63D2FAEE87C00EC5B5A /* XCRemoteSwiftPackageReference "kakao-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/kakao/kakao-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.27.3;
+			};
+		};
+		81612EA12FDEF20C00D58EE9 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 12.14.0;
+			};
+		};
+		81AA51C02FF1000000A51C01 /* XCRemoteSwiftPackageReference "Amplitude-Swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/amplitude/Amplitude-Swift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.18.8;
+			};
+		};
+		81AD0B032FF2000000AD0B01 /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/googleads/swift-package-manager-google-mobile-ads";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 12.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		81AD0B022FF2000000AD0B01 /* GoogleMobileAds */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 81AD0B032FF2000000AD0B01 /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */;
+			productName = GoogleMobileAds;
+		};
+		810F7C37304A70E4000FB1A1 /* AmplitudeSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 81AA51C02FF1000000A51C01 /* XCRemoteSwiftPackageReference "Amplitude-Swift" */;
+			productName = AmplitudeSwift;
+		};
+		8116C6522FAEF0FB00EC5B5A /* KakaoSDKCommon */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8116C63D2FAEE87C00EC5B5A /* XCRemoteSwiftPackageReference "kakao-ios-sdk" */;
+			productName = KakaoSDKCommon;
+		};
+		8116C6542FAEF10400EC5B5A /* KakaoSDKAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8116C63D2FAEE87C00EC5B5A /* XCRemoteSwiftPackageReference "kakao-ios-sdk" */;
+			productName = KakaoSDKAuth;
+		};
+		8116C6562FAEF10D00EC5B5A /* KakaoSDKUser */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8116C63D2FAEE87C00EC5B5A /* XCRemoteSwiftPackageReference "kakao-ios-sdk" */;
+			productName = KakaoSDKUser;
+		};
+		81AB836E2FDFA16000978DD4 /* FirebaseCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 81612EA12FDEF20C00D58EE9 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCore;
+		};
+		81AB83702FDFA16700978DD4 /* FirebaseMessaging */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 81612EA12FDEF20C00D58EE9 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseMessaging;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 8116C5D92FAEDC7D00EC5B5A /* Project object */;
+}

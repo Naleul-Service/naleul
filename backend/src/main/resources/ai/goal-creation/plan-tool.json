@@ -1,0 +1,343 @@
+{
+  "name": "submit_goal_plan",
+  "description": "목표 계획 초안(전체 목표, 세부 목표 1개, 루틴 중심 Task)을 제출한다. 마일스톤은 만들지 않는다(빈 배열). 시스템 프롬프트의 규칙을 모두 지켜야 하며, 응답은 반드시 이 도구로만 한다.",
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "goal": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "1~40자"
+          },
+          "emoji": {
+            "type": "string",
+            "description": "이모지 1개"
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "HEALTH",
+              "STUDY",
+              "CAREER",
+              "FINANCE",
+              "HOBBY",
+              "RELATIONSHIP",
+              "LIFE",
+              "ETC"
+            ]
+          },
+          "description": {
+            "type": "string",
+            "description": "이 목표를 어떻게 이룰지 한두 문장 요약 (사용자가 말한 방법·순서 중심, 이유는 쓰지 않음)"
+          },
+          "metric": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "description": "목표 상세 진행 그래프의 기준(시작값→목표값). 사용자가 말한 현재·목표 수치가 있으면 필수. 결과를 셀 수 없거나 시작값을 모르면 null",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "unit": {
+                "type": "string"
+              },
+              "startValue": {
+                "type": "number"
+              },
+              "targetValue": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "name",
+              "unit",
+              "startValue",
+              "targetValue"
+            ]
+          },
+          "startDate": {
+            "type": "string",
+            "description": "yyyy-MM-dd"
+          },
+          "endDate": {
+            "type": "string",
+            "description": "yyyy-MM-dd"
+          },
+          "planningStyle": {
+            "type": "string",
+            "enum": [
+              "PLANNER",
+              "SPONTANEOUS"
+            ]
+          },
+          "aiNote": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "조정 이유 1~2문장"
+          },
+          "subType": {
+            "type": "string",
+            "enum": [
+              "EXERCISE",
+              "DIET",
+              "WATER",
+              "NO_ALCOHOL",
+              "NO_SMOKING",
+              "HEALTH_OTHER",
+              "LANGUAGE",
+              "CERTIFICATE",
+              "READING",
+              "CODING",
+              "LEARNING_OTHER",
+              "WAKE_UP",
+              "SLEEP",
+              "MEDITATION",
+              "CLEANING",
+              "JOURNAL",
+              "OTHER"
+            ],
+            "description": "목표 카테고리 2단계. [목표 카테고리]에 값이 있으면 그대로"
+          }
+        },
+        "required": [
+          "title",
+          "emoji",
+          "category",
+          "description",
+          "startDate",
+          "endDate",
+          "planningStyle",
+          "subType"
+        ]
+      },
+      "subGoals": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "tempId": {
+              "type": "string"
+            },
+            "title": {
+              "type": "string"
+            },
+            "emoji": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            },
+            "metric": {
+              "type": [
+                "object",
+                "null"
+              ],
+              "description": "잴 수 있는 영역일 때만. 업무·관계·습관 형성처럼 숫자로 재기 어려운 영역이면 null",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "unit": {
+                  "type": "string"
+                },
+                "comparator": {
+                  "type": "string",
+                  "enum": [
+                    "GTE",
+                    "LTE",
+                    "EQ"
+                  ]
+                },
+                "targetValue": {
+                  "type": "number"
+                },
+                "period": {
+                  "type": "string",
+                  "enum": [
+                    "DAILY",
+                    "WEEKLY",
+                    "MONTHLY",
+                    "TOTAL"
+                  ]
+                }
+              },
+              "required": [
+                "name",
+                "unit",
+                "comparator",
+                "targetValue",
+                "period"
+              ]
+            }
+          },
+          "required": [
+            "tempId",
+            "title",
+            "emoji",
+            "description"
+          ]
+        },
+        "description": "정확히 1개 (tempId \"sg1\"). 화면에는 보이지 않고 루틴·Task를 담는 그릇으로만 쓰인다"
+      },
+      "milestones": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "tempId": {
+              "type": "string"
+            },
+            "title": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            },
+            "dueDate": {
+              "type": "string",
+              "description": "yyyy-MM-dd"
+            },
+            "targetValue": {
+              "type": [
+                "number",
+                "null"
+              ]
+            }
+          },
+          "required": [
+            "tempId",
+            "title",
+            "description",
+            "dueDate"
+          ]
+        },
+        "description": "V52부터 사용하지 않음 — 항상 빈 배열 []"
+      },
+      "tasks": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "tempId": {
+              "type": "string"
+            },
+            "type": {
+              "type": "string",
+              "enum": [
+                "ROUTINE",
+                "ONE_TIME"
+              ]
+            },
+            "subGoalTempId": {
+              "type": "string"
+            },
+            "milestoneTempId": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "description": "항상 null (마일스톤을 쓰지 않음)"
+            },
+            "title": {
+              "type": "string"
+            },
+            "emoji": {
+              "type": "string"
+            },
+            "durationMinutes": {
+              "type": "integer",
+              "description": "ROUTINE 10~240 (목표에 필요한 하루 분량 그대로 — 강의 수·문제 수와 맞게), ONE_TIME 5~240"
+            },
+            "reason": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "description": "ROUTINE 필수: 왜 이 요일·시간·분량으로 정했는지 한 문장 (1~100자)"
+            },
+            "description": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "description": "ROUTINE 필수: 무엇을·얼마나·어떻게 (종목·세트·횟수, 교재·범위 등) 1~200자"
+            },
+            "routineDays": {
+              "type": [
+                "array",
+                "null"
+              ],
+              "items": {
+                "type": "string",
+                "enum": [
+                  "MON",
+                  "TUE",
+                  "WED",
+                  "THU",
+                  "FRI",
+                  "SAT",
+                  "SUN"
+                ]
+              }
+            },
+            "preferredStartTime": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "description": "ROUTINE 시작 시각 HH:mm, 모르면 null"
+            },
+            "startDate": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "description": "ROUTINE 시작일 yyyy-MM-dd. 기간별로 하는 일이 바뀌면(예: 이론 → 기출) 그 구간의 시작일, 아니면 null = 목표 시작일부터"
+            },
+            "endDate": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "description": "ROUTINE 종료일. 기간별 루틴이면 그 구간의 마지막 날, null = 목표 종료일까지"
+            },
+            "scheduledDate": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "description": "ONE_TIME 권장 실행일"
+            },
+            "dueDate": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "description": "ONE_TIME 마감일 (필수)"
+            }
+          },
+          "required": [
+            "tempId",
+            "type",
+            "subGoalTempId",
+            "title",
+            "emoji",
+            "durationMinutes"
+          ]
+        }
+      }
+    },
+    "required": [
+      "goal",
+      "subGoals",
+      "milestones",
+      "tasks"
+    ]
+  }
+}

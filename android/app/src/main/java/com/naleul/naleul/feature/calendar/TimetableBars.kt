@@ -1,0 +1,621 @@
+// feature/calendar/TimetableBars.kt
+//
+// iOS Features/Calendar/TimetableBars.swift 를 옮긴 파일.
+// 캘린더 위 · 아래에 뜨는 안내 바들.
+// 웹 원본:
+//   features/timetable/ui/AutoPlaceBar.tsx     — "AI로 TimeTable 배치하기" (모바일은 떠 있는 ✨ 버튼)
+//   features/timetable/ui/ScopeChooser.tsx     — 드래그 후 "어디까지 바꿀까요?" (ScopeChooser · ScopeChips)
+//   features/timetable/ui/FillProposalBar.tsx  — AI 배치 미리보기 "이대로 진행할까요?"
+//   features/timetable/ui/CarryProposalBar.tsx — 22시 이월 제안 "옮길까요?"
+//   features/timetable/ui/useTimetableInteractions.tsx — 묶음 드래그 안내 바
+//
+// 웹은 화면 아래에 떠 있는(fixed) 바 → 여기서는 화면 Column 의 맨 아래에 붙여서 격자를 가리지 않게 해요.
+// 키보드 단축키(1·2·3, Esc)는 휴대폰에 없어서 뺐어요.
+
+package com.naleul.naleul.feature.calendar
+
+import com.naleul.naleul.app.*
+import com.naleul.naleul.core.analytics.*
+import com.naleul.naleul.core.network.*
+import com.naleul.naleul.core.state.*
+import com.naleul.naleul.core.util.*
+import com.naleul.naleul.designsystem.*
+import com.naleul.naleul.model.*
+import com.naleul.naleul.feature.auth.*
+import com.naleul.naleul.feature.calendar.*
+import com.naleul.naleul.feature.calendarimport.*
+import com.naleul.naleul.feature.goal.*
+import com.naleul.naleul.feature.goalcreation.*
+import com.naleul.naleul.feature.habit.*
+import com.naleul.naleul.feature.home.*
+import com.naleul.naleul.feature.notifications.*
+import com.naleul.naleul.feature.pattern.*
+import com.naleul.naleul.feature.record.*
+import com.naleul.naleul.feature.settings.*
+import com.naleul.naleul.feature.taskadd.*
+import com.naleul.naleul.feature.work.*
+
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Text
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.launch
+
+// MARK: - 아래 바 묶음 (한 번에 하나만)
+
+/** 범위 고르기 > AI 배치 확인 > 묶음 안내 > 이월 제안 순서로 하나만 보여줘요 (웹과 같은 우선순위) */
+@Composable
+fun TimetableBottomBars(
+    board: TimetableBoardModel,
+    showCarry: Boolean = true,
+    showFill: Boolean = true,
+    modifier: Modifier = Modifier,
+) {
+    val scope = rememberCoroutineScope()
+    val groupCount = board.groupIds.size
+    val ask = board.ask
+    val proposals = board.proposals
+    val carry = if (showCarry) board.carryProposals else emptyList()
+    val any = ask != null || (proposals != null && showFill) || groupCount > 0 || carry.isNotEmpty()
+    if (!any) return
+    Box(
+        modifier
+            .fillMaxWidth()
+            .padding(start = 12.dp, end = 12.dp, bottom = 8.dp),
+        contentAlignment = Alignment.BottomCenter,
+    ) {
+        when {
+            ask != null -> TimetableScopeChooserBar(
+                title = ask.title, options = ask.options,
+                onChoose = { board.chooseScopeByUser(it) },
+                onCancel = { board.cancelAskByUser() },
+            )
+            proposals != null && showFill -> TimetableFillProposalBar(
+                kind = board.proposalKind, count = proposals.size,
+                edited = board.editedProposals, unscheduled = board.proposalUnscheduled,
+                loading = board.fillApplying,
+                onApply = { scope.launch { board.applyProposalsNow() } },
+                onCancel = { board.cancelProposalsByUser() },
+            )
+            groupCount > 0 -> TimetableGroupBar(count = groupCount, onClear = { board.clearGroupByUser() })
+            carry.isNotEmpty() -> {
+                val first = carry.first()
+                // 제안이 하나씩 바뀔 때마다 한 번 (웹 shownId)
+                LaunchedEffect(first.taskId) {
+                    board.sheetTrack(
+                        "carry_proposal.view",
+                        mapOf("item_count" to carry.size, "days_ago" to first.carriedFromDate?.let { CAL.daysAgo(it) }),
+                    )
+                }
+                TimetableCarryProposalBar(
+                    tasks = carry, today = KST.today(), busy = board.carryBusy,
+                    onAccept = { t ->
+                        board.sheetTrack("carry_proposal.accept_click", mapOf("task_id" to t.taskId, "item_count" to carry.size))
+                        scope.launch { board.acceptCarry(t) }
+                    },
+                    onDecline = { t ->
+                        board.sheetTrack("carry_proposal.decline_click", mapOf("task_id" to t.taskId, "item_count" to carry.size))
+                        scope.launch { board.declineCarry(t) }
+                    },
+                    onAcceptAll = { d ->
+                        val same = carry.count { (TimetableRules.blockDay(it) ?: it.date) == d }
+                        board.sheetTrack("carry_proposal.accept_all_click", mapOf("item_count" to same))
+                        scope.launch { board.acceptAllCarry(date = d) }
+                    },
+                    onRevert = { t ->
+                        board.sheetTrack("carry_proposal.revert_click", mapOf("task_id" to t.taskId, "item_count" to carry.size))
+                        scope.launch { board.revertCarry(t.taskId, fromBar = true) }
+                    },
+                )
+            }
+        }
+    }
+}
+
+/** AI 제안 바 (스펙 6B/6D compact): glass 바탕 + 1.5dp AI 그라데이션 테두리 · padding 12/14 */
+@Composable
+private fun Modifier.timetableAiCard(): Modifier = this
+    .widthIn(max = 600.dp)
+    .fillMaxWidth()
+    .aiBorder()
+    .padding(horizontal = 14.dp, vertical = 12.dp)
+
+/** 6D 첫 줄: AIBadge · 제목 · Neutral Tag · 정보(i) */
+@Composable
+private fun TimetableProposalHeader(title: String, tag: String, infoOpen: Boolean, hasInfo: Boolean, onInfo: () -> Unit) {
+    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        AIBadge()
+        Text(title, style = NType.labelLG, color = NC.textPrimary, maxLines = 2, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
+        NTag(tag, tone = BadgeTone.neutral)
+        if (hasInfo) {
+            NIconButton(
+                "info.circle", size = 16.dp, color = if (infoOpen) NC.textBrand else NC.textTertiary,
+                label = if (infoOpen) "설명 접기" else "설명 보기", action = onInfo,
+            )
+        }
+    }
+}
+
+/** 6D 둘째 줄 오른쪽: ‹ 1 / 3 › */
+@Composable
+private fun TimetableProposalPager(index: Int, total: Int, onIndex: (Int) -> Unit) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        NIconButton("chevron.left", size = 18.dp, label = "이전 제안", enabled = index > 0) { onIndex(index - 1) }
+        Text("${index + 1} / $total", style = NType.bodySMMedium, color = NC.textSecondary)
+        NIconButton("chevron.right", size = 18.dp, label = "다음 제안", enabled = index < total - 1) { onIndex(index + 1) }
+    }
+}
+
+/** 떠 있는 카드 모양 (웹 bg-surface shadow-pop border-line rounded-2xl p-4) */
+@Composable
+private fun Modifier.timetableFloatingCard(): Modifier {
+    val shape = RoundedCornerShape(Radius.xxl)
+    return this
+        .widthIn(max = 600.dp)
+        .fillMaxWidth()
+        .popShadow(shape)
+        .background(NC.surface, shape)
+        .border(1.dp, NC.borderSubtle, shape)
+        .padding(14.dp)
+}
+
+// MARK: - AI로 TimeTable 배치하기 (떠 있는 ✨ 버튼)
+
+/**
+ * 화면 오른쪽 아래 떠 있는 동그란 버튼. 시간 미정 Task 가 있으면 색이 켜지고 개수 배지가 붙어요.
+ * 직접 정한 시간(📌)과 고정 시간은 그대로 두고 남은 빈 시간에 넣어요.
+ * 누르면 바로 저장하지 않고 점선으로 먼저 보여줘요 → 화면 아래에서 "이대로 진행할까요?"
+ * (웹 AutoPlaceBar 띠는 격자를 가려서, 모바일에서는 아이콘 버튼으로 바꿨어요)
+ */
+@Composable
+fun TimetableAIFab(
+    /** 서버 데이터 그대로 (점선 제안을 덧입히기 전) */
+    days: List<TimetableDay>,
+    today: String,
+    loading: Boolean = false,
+    modifier: Modifier = Modifier,
+    /** 주면 눌렀을 때 바로 배치하지 않고 AI 메뉴를 띄워요 (스펙 11.1) — "AI로 일정 조정" */
+    onScheduleAi: (() -> Unit)? = null,
+    /** false 면 메뉴의 "AI로 TimeTable 자동 배치" 를 흐리게 (월간 — 격자 없음) */
+    autoPlaceEnabled: Boolean = true,
+    onPreview: (startDate: String, endDate: String) -> Unit,
+) {
+    val targets = TimetableRules.unplacedOf(days, today = today)
+    var menuOpen by remember { mutableStateOf(false) }
+    val total = targets.sumOf { it.count }
+    val active = total > 0
+    val haptic = LocalHapticFeedback.current
+    Box(
+        modifier.semantics {
+            contentDescription = (if (onScheduleAi != null) "AI 메뉴, " else "AI로 TimeTable 배치하기, ") + (if (active) "시간 미정 Task ${total}개" else "모두 배치됨")
+        }
+    ) {
+        // 예전 버튼 동작 그대로 = 메뉴의 "AI로 TimeTable 자동 배치"
+        val autoPlace: () -> Unit = {
+            val first = targets.firstOrNull()
+            val last = targets.lastOrNull()
+            if (!active || first == null || last == null) {
+                Toast.show("모든 Task가 TimeTable에 배치돼 있어요")
+            } else {
+                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                onPreview(first.date, last.date)
+            }
+        }
+        val schedule = onScheduleAi
+        if (schedule != null) {
+            NDropdownMenu(
+                expanded = menuOpen, onDismissRequest = { menuOpen = false },
+                containerColor = NC.bgElevated, shape = RoundedCornerShape(Radius.xl),
+            ) {
+                NDropdownMenuItem(
+                    // 이미 있는 일정을 말로 옮겨요 (2026-10 이름 변경: AI로 일정 조정 → AI로 일정 옮기기)
+                    text = { Text("AI로 일정 옮기기", style = NType.bodyMD, color = NC.textPrimary) },
+                    leadingIcon = { SfImage("wand.and.stars", size = 16.dp, tint = NC.textPrimary) },
+                    onClick = { menuOpen = false; schedule() },
+                )
+                NDropdownMenuItem(
+                    // 시간 미정 Task 를 빈 시간에 넣어요 — 넣을 게 없으면 흐리게 (2026-10)
+                    text = {
+                        Text(
+                            if (active) "AI로 빈 시간에 자동 배치 (${total}개)" else "AI로 빈 시간에 자동 배치",
+                            style = NType.bodyMD, color = if (autoPlaceEnabled && active) NC.textPrimary else NC.disabledFg,
+                        )
+                    },
+                    leadingIcon = { SfImage("sparkles", size = 16.dp, tint = if (autoPlaceEnabled && active) NC.textPrimary else NC.disabledFg) },
+                    enabled = autoPlaceEnabled && active,
+                    onClick = { menuOpen = false; autoPlace() },
+                )
+            }
+        }
+        TimetableFabPressStyle(
+            enabled = !loading,
+            onClick = { if (schedule != null) menuOpen = true else autoPlace() },
+        ) {
+            // 스펙 13.6: 공용 떠 있는 버튼 (56 · 아이콘 22 · 같은 그림자)
+            NFabFace(icon = "sparkles", style = if (active) NFabStyle.ai else NFabStyle.surface, loading = loading)
+        }
+        if (active && !loading) {
+            Box(
+                Modifier
+                    .align(Alignment.TopEnd)
+                    .offset(x = 4.dp, y = (-4).dp)
+                    .defaultMinSize(minWidth = 20.dp, minHeight = 20.dp)
+                    .border(2.dp, NC.bgSurface, CircleShape)
+                    .background(NC.actionDanger, CircleShape)
+                    .padding(horizontal = 5.dp),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text("$total", style = ptMono(11, PTWeight.bold), color = NC.actionDangerFg)
+            }
+        }
+    }
+}
+
+/**
+ * 누르는 동안 살짝 작아지는 버튼 효과 (iOS ButtonStyle TimetableFabPressStyle)
+ *   TimetableFabPressStyle(onClick = { … }) { 버튼 모양 }
+ * 버튼 모양을 직접 만든 Row 에 쓰고 싶으면 Modifier.timetableFabPress(onClick = { … }) 를 써도 돼요.
+ */
+@Composable
+fun TimetableFabPressStyle(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    content: @Composable BoxScope.() -> Unit,
+) {
+    Box(modifier.timetableFabPress(enabled = enabled, onClick = onClick), contentAlignment = Alignment.Center, content = content)
+}
+
+/** 누르는 동안 0.92 배로 작아져요 */
+@Composable
+fun Modifier.timetableFabPress(enabled: Boolean = true, onClick: () -> Unit): Modifier {
+    val interaction = remember { MutableInteractionSource() }
+    val pressed by interaction.collectIsPressedAsState()
+    val scale by animateFloatAsState(if (pressed) 0.92f else 1f, spring(dampingRatio = 0.7f, stiffness = 600f), label = "fabPress")
+    return this
+        .graphicsLayer { scaleX = scale; scaleY = scale }
+        .clickable(interactionSource = interaction, indication = null, enabled = enabled, role = Role.Button, onClick = onClick)
+}
+
+// MARK: - 범위 고르기 (드래그 직후)
+
+/** 범위 칩 (시간 직접 입력 창 안에서 쓰는 알약 버튼 — 웹 ScopeChips) */
+@Composable
+fun TimetableScopeChips(
+    options: List<TimetableScopeOption>,
+    value: ChangeScope,
+    onChange: (ChangeScope) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val current = options.firstOrNull { it.scope == value }
+    val hint = options.firstOrNull { it.disabledReason != null }?.disabledReason ?: current?.hint ?: ""
+    Column(modifier, verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        Text("적용 범위", style = pt(12, PTWeight.medium), color = NC.ink3)
+        FlowLayout(spacing = 6.dp) {
+            for (o in options) {
+                val disabled = o.disabledReason != null
+                NChip(
+                    o.label, selected = value == o.scope, size = ChipSize.sm,
+                    modifier = Modifier.alpha(if (disabled) 0.4f else 1f),
+                ) { if (!disabled) onChange(o.scope) }
+            }
+        }
+        Text(hint, style = pt(12), color = NC.ink3)
+    }
+}
+
+/**
+ * 드래그로 루틴 · 고정 시간을 옮긴 직후 화면 아래에 뜨는 선택 바
+ * X = 취소(원래 자리로). 고르지 않고 다른 블록을 누르거나 끌면 "이날만"으로 저장돼요.
+ */
+@Composable
+fun TimetableScopeChooserBar(
+    title: String,
+    options: List<TimetableScopeOption>,
+    loading: Boolean = false,
+    onChoose: (ChangeScope) -> Unit,
+    onCancel: () -> Unit,
+) {
+    val columns = if (options.size > 3) 2 else 3
+    Column(
+        Modifier.timetableFloatingCard().semantics { contentDescription = "적용 범위 고르기" },
+        verticalArrangement = Arrangement.spacedBy(10.dp),
+    ) {
+        Row(verticalAlignment = Alignment.Top, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                Text(title, style = pt(15, PTWeight.bold), color = NC.ink)
+                Text("어디까지 바꿀까요?", style = pt(12), color = NC.ink3)
+            }
+            NIconButton("xmark", size = 14.dp, label = "취소하고 원래대로", modifier = Modifier.offset(x = 6.dp, y = (-6).dp)) {
+                if (!loading) onCancel()
+            }
+        }
+        // 2열 또는 3열 격자 (iOS LazyVGrid)
+        for (row in options.chunked(columns)) {
+            Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                for (o in row) {
+                    TimetableScopeOptionButton(
+                        option = o, disabled = o.disabledReason != null || loading,
+                        modifier = Modifier.weight(1f).fillMaxHeight(),
+                    ) { onChoose(o.scope) }
+                }
+                // 마지막 줄이 모자라면 빈 칸으로 채워 폭을 맞춰요
+                repeat(columns - row.size) { Spacer(Modifier.weight(1f)) }
+            }
+        }
+    }
+}
+
+@Composable
+private fun TimetableScopeOptionButton(
+    option: TimetableScopeOption,
+    disabled: Boolean,
+    modifier: Modifier = Modifier,
+    action: () -> Unit,
+) {
+    val shape = RoundedCornerShape(Radius.xl)
+    Column(
+        modifier
+            .defaultMinSize(minHeight = 74.dp)
+            .alpha(if (disabled) 0.4f else 1f)
+            .clip(shape)
+            .background(NC.surface, shape)
+            .border(1.dp, NC.borderSubtle, shape)
+            .clickable(enabled = !disabled, role = Role.Button, onClick = action)
+            .padding(horizontal = 10.dp, vertical = 9.dp),
+        verticalArrangement = Arrangement.spacedBy(3.dp),
+    ) {
+        Row(horizontalArrangement = Arrangement.spacedBy(5.dp), verticalAlignment = Alignment.CenterVertically) {
+            SfImage(TimetableScope.icon(option.scope), size = 12.dp, tint = NC.textBrand)
+            Text(option.label, style = pt(13, PTWeight.bold), color = NC.ink, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        }
+        Text(option.disabledReason ?: option.hint, style = timetableFont(10.5), color = NC.ink3)
+    }
+}
+
+// MARK: - AI 배치 미리보기 확인
+
+/** 점선 블록을 끌어 고친 뒤 [이대로 진행] 하면 저장, [취소] 하면 아무것도 안 바뀌어요 */
+@Composable
+fun TimetableFillProposalBar(
+    /** fill = AI로 배치하기 · added = 방금 추가한 Task (Task 는 이미 저장됨, 시간만 묻는 중) */
+    kind: TimetableProposalKind = TimetableProposalKind.fill,
+    count: Int,
+    /** 사용자가 끌어서 고친 제안 수 */
+    edited: Int,
+    /** 빈 시간이 없어 제안하지 못한 수 */
+    unscheduled: Int,
+    loading: Boolean,
+    onApply: () -> Unit,
+    onCancel: () -> Unit,
+) {
+    val isNew = kind == TimetableProposalKind.added
+    val title = if (isNew) {
+        if (count > 0) "새 Task ${count}개를 점선 자리에 놓을게요. 이대로 진행할까요?" else "새 Task를 놓을 빈 시간을 찾지 못했어요"
+    } else {
+        if (count > 0) "점선 자리에 ${count}개를 배치할게요. 이대로 진행할까요?" else "배치할 빈 시간을 찾지 못했어요"
+    }
+    var n = if (count > 0) "마음에 안 드는 블록은 끌어서 옮겨 보세요. 시간 미정 칸으로 끌면 이번 배치에서 빠져요." else ""
+    if (isNew) n += " Task는 이미 추가됐어요 — 건너뛰면 시간 미정으로 남아요."
+    if (edited > 0) n += " 직접 옮긴 ${edited}개는 그 시간에 고정돼요."
+    if (unscheduled > 0) n += " 빈 시간이 없어 ${unscheduled}개는 시간 미정으로 남아요."
+    val note = n.trim()
+    val cancelTitle = if (count == 0) "닫기" else "건너뛰기"
+    var infoOpen by remember { mutableStateOf(false) }
+
+    // 스펙 6D (compact): 1줄 AIBadge · 제목 · "새로 배치" · (i) / 2줄 요약 / 3줄 [건너뛰기 ✕] [적용 ✓]
+    Column(
+        Modifier.timetableAiCard().semantics { contentDescription = "AI 배치 확인" },
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        TimetableProposalHeader(
+            title = if (count > 0) (if (isNew) "새 Task ${count}개 배치 제안" else "${count}개 배치 제안") else "빈 시간을 찾지 못했어요",
+            tag = "새로 배치", infoOpen = infoOpen, hasInfo = note.isNotEmpty(),
+        ) { infoOpen = !infoOpen }
+        Text(title, style = NType.bodySM, color = NC.textSecondary)
+        if (infoOpen && note.isNotEmpty()) {
+            Text(note, style = NType.captionMD, color = NC.textTertiary)
+        }
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+            Spacer(Modifier.weight(1f))
+            NButton(cancelTitle, variant = NButtonVariant.secondary, size = NButtonSize.sm, icon = "xmark", enabled = !loading, action = onCancel)
+            if (count > 0) {
+                NButton("적용", variant = NButtonVariant.primary, size = NButtonSize.sm, icon = "checkmark", loading = loading, action = onApply)
+            }
+        }
+    }
+}
+
+// MARK: - 22시 이월 제안
+
+/**
+ * 못 한 일을 말없이 옮기면 "내가 잘못 넣었나?" 하고 헷갈려서, 옮긴 자리를 점선으로 보여주고 물어봐요.
+ *   "어제 못한 '보고서 쓰기'를 오늘 15:00–16:00로 옮길까요?"  [옮기기] [안 옮기기]
+ */
+@Composable
+fun TimetableCarryProposalBar(
+    tasks: List<TimeBlockTask>,
+    today: String,
+    busy: TimetableCarryAction?,
+    onAccept: (TimeBlockTask) -> Unit,
+    onDecline: (TimeBlockTask) -> Unit,
+    onAcceptAll: (String) -> Unit,
+    /** 원래 날로 되돌리기 (2026-10) */
+    onRevert: ((TimeBlockTask) -> Unit)? = null,
+) {
+    if (tasks.isEmpty()) return
+    // 여러 제안이면 ‹ › 로 넘겨 봐요 (화면에 보이는 제안에만 [적용] · [건너뛰기] 가 걸려요)
+    var page by remember(tasks.size) { mutableStateOf(0) }
+    val index = page.coerceIn(0, tasks.size - 1)
+    val t = tasks[index]
+    val date = TimetableRules.blockDay(t) ?: t.date ?: today
+    val from = t.carriedFromDate?.let { TimetableRules.relDay(it, base = today) } ?: "전날"
+    val to = TimetableRules.relDay(date, base = today)
+    val name = "'${TimetableRules.title(t.emoji, t.taskName)}'"
+    val whenText = if (t.plannedStartAt != null) "$to ${KST.hm(t.plannedStartAt)}–${KST.hm(t.plannedEndAt)}" else "$to(시간 미정)"
+    val sameDay = tasks.filter { (TimetableRules.blockDay(it) ?: it.date) == date }
+    val isBusy = busy != null
+    var infoOpen by remember { mutableStateOf(false) }
+
+    // 스펙 6D (compact): 1줄 AIBadge · 제목 · "새로 배치" · (i) / 2줄 시간 · ‹ 1/3 › / 3줄 [모두 적용] [건너뛰기 ✕] [적용 ✓]
+    Column(
+        Modifier.timetableAiCard().semantics { contentDescription = "못 한 일 옮기기" },
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        TimetableProposalHeader(
+            title = "$from 못한 ${TimetableRules.eulReul(name)} 옮길까요?",
+            tag = "새로 배치", infoOpen = infoOpen, hasInfo = true,
+        ) { infoOpen = !infoOpen }
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+            val cf = t.carriedFromDate
+            if (cf != null) {
+                Text(KST.formatMonthDay(cf), style = NType.bodySM, color = NC.textTertiary)
+                SfImage("arrow.right", size = 12.dp, tint = NC.textTertiary)
+            }
+            Text(whenText, style = NType.bodySMMedium.copy(fontFeatureSettings = "tnum"), color = NC.textPrimary, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
+            if (tasks.size > 1) TimetableProposalPager(index = index, total = tasks.size) { page = it }
+        }
+        if (infoOpen) {
+            Text("점선으로 표시한 자리예요. 블록을 직접 끌어 옮겨도 돼요.", style = NType.captionMD, color = NC.textTertiary)
+        }
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+            if (sameDay.size > 1) {
+                NButton(
+                    "모두 적용", variant = NButtonVariant.ghost, size = NButtonSize.sm,
+                    loading = busy == TimetableCarryAction.acceptAll, enabled = !isBusy,
+                ) { onAcceptAll(date) }
+            }
+            Spacer(Modifier.weight(1f))
+            if (onRevert != null && t.carriedFromDate != null) {
+                NButton("원래 날로", variant = NButtonVariant.secondary, size = NButtonSize.sm, icon = "arrow.uturn.backward", loading = busy == TimetableCarryAction.revert, enabled = !isBusy) {
+                    onRevert(t)
+                }
+            }
+            NButton("건너뛰기", variant = NButtonVariant.secondary, size = NButtonSize.sm, icon = "xmark", loading = busy == TimetableCarryAction.decline, enabled = !isBusy) {
+                onDecline(t)
+            }
+            NButton("적용", variant = NButtonVariant.primary, size = NButtonSize.sm, icon = "checkmark", loading = busy == TimetableCarryAction.accept, enabled = !isBusy) {
+                onAccept(t)
+            }
+        }
+    }
+}
+
+// MARK: - 묶음 드래그 안내
+
+@Composable
+fun TimetableGroupBar(count: Int, onClear: () -> Unit) {
+    val text = buildAnnotatedString {
+        withStyle(SpanStyle(fontWeight = FontWeight.Bold)) { append(if (count > 1) "${count}개 묶음" else "1개 선택") }
+        append(if (count > 1) " · 하나를 끌면 같이 움직여요" else " · Shift(⌘)+클릭으로 더 묶어요")
+    }
+    Row(
+        Modifier
+            .widthIn(max = 560.dp)
+            .fillMaxWidth()
+            .height(44.dp)
+            .popShadow(CircleShape)
+            .background(NC.bgInverse, CircleShape)
+            .padding(start = 16.dp, end = 8.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        SfImage("link", size = 14.dp, tint = NC.textInverse)
+        Text(text, style = NType.bodySM, color = NC.textInverse, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
+        Row(
+            Modifier
+                .height(28.dp)
+                .clip(CircleShape)
+                .background(NC.textInverse.copy(alpha = 0.15f))
+                .clickable(role = Role.Button, onClick = onClear)
+                .padding(horizontal = 10.dp),
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            SfImage("xmark", size = 12.dp, tint = NC.textInverse)
+            Text("묶음 풀기", style = NType.bodySMMedium, color = NC.textInverse)
+        }
+    }
+}
+
+@Preview(showBackground = true, heightDp = 1400)
+@Composable
+private fun TimetableBarsPreview() {
+    NaleulTheme(dark = false) {
+        val today = KST.today()
+        val days = TimetableSampleData.days(from = today, to = KST.addDays(today, 2))
+        val carry = days[1].tasks[1].copy(carryPending = true, carriedFromDate = KST.addDays(today, -1))
+        Column(
+            Modifier.canvasBackground().verticalScroll(rememberScrollState()).padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                TimetableAIFab(days = days, today = today) { _, _ -> }
+                TimetableAIFab(days = emptyList(), today = today) { _, _ -> }
+                TimetableAIFab(days = days, today = today, loading = true) { _, _ -> }
+            }
+            TimetableScopeChooserBar(
+                title = "'아침 스트레칭' → 08:00–08:30",
+                options = TimetableScope.options(kind = TimetableScopeKind.routine, isToday = true),
+                onChoose = { }, onCancel = { },
+            )
+            TimetableScopeChooserBar(
+                title = "☀️ 기상 07:00 → 07:30",
+                options = TimetableScope.options(kind = TimetableScopeKind.fixed, isToday = false, weekdayLabel = "토요일 아침"),
+                onChoose = { }, onCancel = { },
+            )
+            TimetableFillProposalBar(
+                kind = TimetableProposalKind.added, count = 2, edited = 1, unscheduled = 1, loading = false,
+                onApply = { }, onCancel = { },
+            )
+            TimetableCarryProposalBar(
+                tasks = listOf(carry), today = today, busy = null,
+                onAccept = { }, onDecline = { }, onAcceptAll = { },
+            )
+            TimetableGroupBar(count = 3, onClear = { })
+            TimetableScopeChips(
+                options = TimetableScope.options(kind = TimetableScopeKind.routine, isToday = false, sameDay = false),
+                value = ChangeScope.DAY, onChange = { },
+            )
+        }
+    }
+}

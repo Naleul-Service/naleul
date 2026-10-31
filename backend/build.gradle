@@ -1,0 +1,93 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.4.5'
+	id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'com.naleul'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(21)
+	}
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+	jvmArgs '-XX:+EnableDynamicAgentLoading'
+}
+
+repositories {
+	mavenCentral()
+}
+
+// ★ 여기 추가: Spring Cloud AWS BOM
+ext {
+	set('springCloudAwsVersion', "3.1.1")
+}
+
+dependencyManagement {
+	imports {
+		mavenBom "io.awspring.cloud:spring-cloud-aws-dependencies:${springCloudAwsVersion}"
+	}
+}
+
+dependencies {
+	// Spring Boot 기본
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'  // WebClient (카카오, Apple API 호출)
+
+
+	//인앱 결제
+	implementation 'com.apple.itunes.storekit:app-store-server-library:5.2.0'
+
+	// Lombok
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+
+	// Firebase Admin SDK
+	implementation 'com.google.firebase:firebase-admin:9.4.3'
+
+	// DB
+	runtimeOnly 'com.mysql:mysql-connector-j'
+
+	// Flyway
+	implementation 'org.flywaydb:flyway-core'
+	implementation 'org.flywaydb:flyway-mysql'
+
+	// JWT - 0.12.6으로 통일 (중복 제거)
+	implementation 'io.jsonwebtoken:jjwt-api:0.12.6'
+	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.6'
+	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.6'
+
+	// S3
+	implementation 'io.awspring.cloud:spring-cloud-aws-starter-s3'  // ★ 버전 표기 제거 (BOM이 관리)
+	// 운영 대시보드 서버 비용 자동 불러오기 (AWS Cost Explorer, 2026-10). 버전은 spring-cloud-aws BOM 의 AWS SDK BOM 이 관리
+	implementation 'software.amazon.awssdk:costexplorer'
+
+	// 개발
+//	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
+	// 테스트
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.security:spring-security-test'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+	testRuntimeOnly 'com.h2database:h2'
+	testCompileOnly 'org.projectlombok:lombok'
+	testAnnotationProcessor 'org.projectlombok:lombok'
+}
+
+configurations.all {
+	resolutionStrategy {
+		force 'com.google.auth:google-auth-library-oauth2-http:1.23.0'
+		force 'com.google.auth:google-auth-library-credentials:1.23.0'
+		force 'com.google.api-client:google-api-client:2.2.0'
+		force 'com.google.api-client:google-api-client-gson:2.2.0'
+		force 'com.google.http-client:google-http-client:1.43.3'
+	}
+}

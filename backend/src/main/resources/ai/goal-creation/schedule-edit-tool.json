@@ -1,0 +1,85 @@
+{
+  "name": "submit_schedule_edit",
+  "description": "캘린더의 루틴 · Task 에 적용할 변경안을 제출한다.",
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "summary": {
+        "type": "string",
+        "description": "무엇을 어떻게 바꾸는지 해요체 한두 문장"
+      },
+      "ops": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "MOVE_ROUTINE",
+                "MOVE_TASK"
+              ]
+            },
+            "targetId": {
+              "type": "integer",
+              "description": "MOVE_ROUTINE: 루틴 id · MOVE_TASK: Task id"
+            },
+            "days": {
+              "type": [
+                "array",
+                "null"
+              ],
+              "items": {
+                "type": "string",
+                "enum": [
+                  "MON",
+                  "TUE",
+                  "WED",
+                  "THU",
+                  "FRI",
+                  "SAT",
+                  "SUN"
+                ]
+              }
+            },
+            "startTime": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "description": "HH:mm"
+            },
+            "durationMinutes": {
+              "type": [
+                "integer",
+                "null"
+              ]
+            },
+            "date": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "description": "yyyy-MM-dd (MOVE_TASK)"
+            },
+            "reason": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "description": "이렇게 옮기는 이유 해요체 한 문장 (예: \"20시 정기회의와 겹쳐서 바로 뒤 21시로 옮겨요\")"
+            }
+          },
+          "required": [
+            "type",
+            "targetId"
+          ]
+        }
+      }
+    },
+    "required": [
+      "summary",
+      "ops"
+    ]
+  }
+}

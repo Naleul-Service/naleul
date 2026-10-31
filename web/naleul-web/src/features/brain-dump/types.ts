@@ -1,0 +1,137 @@
+/**
+ * Brain dump API 타입 (백엔드 BE-5 DTO 와 1:1)
+ * 시간은 "HH:mm" 또는 "HH:mm:ss" (LocalTime), 날짜는 "YYYY-MM-DD"
+ */
+import type { TaskKind, TaskPriority } from '@/features/timetable/types'
+
+/** ON: 그날 하는 일 · DUE: 그날까지 · NONE: 날짜 없음 */
+export type DateType = 'ON' | 'DUE' | 'NONE'
+export type GoalMatchType = 'EXISTING' | 'TEMP' | 'NONE'
+
+export interface TaskQuota {
+  premium: boolean
+  /** Pro 는 null (무제한) */
+  dailyLimit?: number | null
+  usedToday: number
+  remaining?: number | null
+}
+
+// ── 1단계 → 2단계 ──
+export interface ParseItemRequest {
+  clientKey: string
+  text: string
+  date?: string | null
+  dateType?: DateType | null
+  startTime?: string | null
+  endTime?: string | null
+  /** 사용자가 정한 걸리는 시간(분) — AI 추정보다 우선 */
+  estimatedMinutes?: number | null
+}
+
+export interface GoalLink {
+  type: GoalMatchType
+  goalCategoryId?: number | null
+  goalName?: string | null
+  goalEmoji?: string | null
+  goalColorCode?: string | null
+  temporaryGoal: boolean
+  generalCategoryId?: number | null
+  generalCategoryName?: string | null
+  milestoneId?: number | null
+  milestoneTitle?: string | null
+  tempKey?: string | null
+  reason?: string | null
+}
+
+export interface ParsedItem {
+  clientKey: string
+  title: string
+  dateType: DateType
+  scheduledDate?: string | null
+  dueDate?: string | null
+  startTime?: string | null
+  endTime?: string | null
+  estimatedMinutes: number
+  priority?: TaskPriority | null
+  kind?: TaskKind | null
+  goal: GoalLink
+}
+
+export interface ParseResponse {
+  items: ParsedItem[]
+  tempGoals: { tempKey: string; name: string; emoji?: string | null }[]
+  /** true 면 AI 없이 규칙으로만 해석 (목표 연결이 비어 있을 수 있음) */
+  aiFailed: boolean
+  /** true 면 오늘 AI 정리 횟수를 다 써서 기본 정리로만 나눴어요 (aiFailed 도 true) */
+  aiLimited?: boolean
+}
+
+// ── 2단계 → 3단계 ──
+export interface ConfirmItem {
+  clientKey: string
+  title: string
+  dateType: DateType
+  scheduledDate?: string | null
+  dueDate?: string | null
+  startTime?: string | null
+  endTime?: string | null
+  estimatedMinutes?: number | null
+  priority?: TaskPriority | null
+  kind?: TaskKind | null
+  goalCategoryId?: number | null
+  generalCategoryId?: number | null
+  milestoneId?: number | null
+  tempGoalKey?: string | null
+  /** 업무형 목표의 주제 (WorkTopic) — 2단계 줄에서 바로 골라요 (2026-10) */
+  workTopicId?: number | null
+}
+
+export interface TempGoalInput {
+  tempKey: string
+  name: string
+  emoji?: string | null
+  colorId?: number | null
+}
+
+export interface ConfirmRequest {
+  items: ConfirmItem[]
+  tempGoals: TempGoalInput[]
+  /** true: 시간을 정하지 않은 Task 는 저장만 하고(pending) 배치는 점선 미리보기 → 확인 후에 */
+  placeLater?: boolean
+}
+
+export interface Placement {
+  taskId: number
+  clientKey: string
+  title: string
+  date: string
+  start: string
+  end: string
+  reason?: string | null
+  locked: boolean
+}
+
+export interface ConfirmResponse {
+  /** false 면 아무것도 저장하지 않음 → conflicts 를 보여주고 시간을 고쳐 다시 요청 */
+  created: boolean
+  placements: Placement[]
+  movedToOtherDays: Placement[]
+  unscheduled: { taskId: number; clientKey: string; title: string; date?: string | null }[]
+  /** placeLater 로 저장만 한 Task — 이 id 들로 배치 미리보기를 받아 "이대로 진행할까요?"를 물어요 */
+  pending?: { taskId: number; clientKey: string; title: string; date?: string | null }[]
+  conflicts: {
+    clientKey: string
+    title: string
+    start: string
+    end: string
+    conflictTaskId?: number | null
+    conflictTitle?: string | null
+  }[]
+  tempGoals: {
+    tempKey: string
+    goalCategoryId: number
+    name: string
+    emoji?: string | null
+    colorCode?: string | null
+  }[]
+}

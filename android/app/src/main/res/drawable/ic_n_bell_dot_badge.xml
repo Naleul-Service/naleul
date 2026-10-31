@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Figma Naleul design system (node 2932:11149) — 자동 변환, 직접 고치지 마세요 -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:pathData="M15.421700000000001,5.0A3.0,3.0 0,1 1,21.4217,5.0A3.0,3.0 0,1 1,15.421700000000001,5.0Z"
+        android:fillColor="#FFBC3942" />
+</vector>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Component_ver.2: bg/canvas (라이트 = 흰색, 스펙 10.4) · action/primary -->
+    <color name="canvas">#FFFFFF</color>
+    <color name="brand">#0F7A9C</color>
+</resources>

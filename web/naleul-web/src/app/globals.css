@@ -1,0 +1,795 @@
+@import 'tailwindcss';
+
+/*
+ * 디자인 토큰 — Tailwind 클래스로 바로 쓸 수 있어요.
+ * 예) bg-brand, text-ink-3, border-line, rounded-card, shadow-card
+ * 새 시맨틱: bg-bg-surface, text-text-secondary, border-border-subtle, bg-action-primary-bg, text-h3, text-label-md …
+ * 기존 이름(ink · surface · brand …)은 새 값으로 다시 연결돼 있어요 (iOS · Android 와 같은 매핑표).
+ */
+@theme static {
+  --font-sans:
+    'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Noto Sans KR',
+    'Malgun Gothic', sans-serif;
+
+  /* ── 기존 토큰 (이름 유지 · 새 값으로 다시 연결 — web/iOS/Android 공통 매핑표) ── */
+  --color-ink: #121820;
+  --color-ink-2: #6b7685;
+  --color-ink-3: #98a2b0;
+  --color-ink-4: #c3cad3;
+  --color-canvas: #ffffff; /* 명세 10.4 — 페이지 바탕 흰색 */
+  --color-surface: #ffffff;
+  --color-subtle: #f1f4f8;
+  --color-line: #e7ecf2;
+  --color-line-strong: #d5dce4;
+  --color-brand: #0f7a9c;
+  --color-brand-strong: #0d6b89;
+  --color-brand-soft: #e8f4f5;
+  --color-success: #246b42;
+  --color-success-soft: #edf7f0;
+  --color-warning: #f5b63a;
+  --color-warning-soft: #fff6df;
+  --color-danger: #bc3942;
+  --color-danger-soft: #fbf0f0;
+  --color-on-ink: #ffffff;
+  --color-inverse: #121820;
+  --color-warning-ink: #805a12;
+  --color-warning-ink-strong: #6b4a0e;
+  --color-hatch: #f6f8fb;
+  --color-hatch-line: #e3e8ee;
+  /* 수면도 다른 고정 시간과 같은 회색 빗금 (명세 9.5 — 보라색 없앰) */
+  --color-sleep: #f6f8fb;
+  --color-sleep-line: #e3e8ee;
+  --color-sleep-ink: #6b7685;
+  --color-heat-1: #dcebee;
+  --color-heat-2: #a9d1dc;
+  --color-heat-3: #5fb0c6;
+  --color-heat-4: #1f8fae;
+  --color-heat-5: #0b5d77;
+
+  /* ── 새 시맨틱 토큰 (Figma Component_ver.2 · Semantic Color) ── */
+  --color-bg-canvas: #ffffff;
+  /* 데스크톱 웹 페이지 바탕 (모바일 반응형 제외, AppShell lg:bg-bg-page). 되돌리려면 #ffffff 로 */
+  --color-bg-page: #f8fafc;
+  --color-bg-surface: #ffffff;
+  --color-bg-elevated: #ffffff;
+  --color-bg-subtle: #f1f4f8;
+  --color-bg-sunken: #f6f8fb;
+  --color-bg-inverse: #121820;
+  --color-bg-overlay: #00000066;
+  --color-text-primary: #121820;
+  --color-text-secondary: #6b7685;
+  --color-text-tertiary: #98a2b0;
+  --color-text-placeholder: #a3acb9;
+  --color-text-brand: #0d6b89;
+  --color-text-inverse: #ffffff;
+  --color-border-subtle: #e7ecf2;
+  --color-border-soft: #eef2f6;
+  --color-border-control: #b9c2cd;
+  --color-border-focus: #0f7a9c;
+  --color-action-primary-bg: #0f7a9c;
+  --color-action-primary-bg-hover: #0d6b89;
+  --color-action-primary-bg-pressed: #0b5d77;
+  --color-action-primary-fg: #ffffff;
+  --color-action-secondary-bg: #e8f4f5;
+  --color-action-secondary-bg-hover: #dcebee;
+  --color-action-secondary-bg-pressed: #cce1e5;
+  --color-action-secondary-fg: #0d6b89;
+  --color-action-secondary-border: #d3e6ea;
+  --color-action-outline-border: #0f7a9c;
+  --color-action-ghost-hover: #e8f4f5;
+  --color-action-ghost-pressed: #dcebee;
+  --color-action-danger-bg: #d13f49;
+  --color-action-danger-bg-hover: #b83740;
+  --color-action-danger-bg-pressed: #9f3037;
+  --color-action-danger-fg: #ffffff;
+  --color-disabled-bg: #f1f4f8;
+  --color-disabled-fg: #a3acb9;
+  --color-selection-bg: #f1f4f8;
+  --color-selection-fg: #121820;
+  --color-status-success-bg: #edf7f0;
+  --color-status-success-fg: #246b42;
+  --color-status-warning-bg: #fff6df;
+  --color-status-warning-fg: #805a12;
+  --color-status-error-bg: #fbf0f0;
+  --color-status-error-fg: #bc3942;
+  --color-status-info-bg: #f1f4f8;
+  --color-status-info-fg: #3f4a5a;
+  --color-accent-mint: #00cba8;
+  --color-accent-on-mint: #121820;
+  --color-progress-track: #e3f1f4;
+  /* 히트맵 빈 칸 · 안 한 날 */
+  --color-heat-empty: #f1f4f8;
+  /* 회고 배지 바탕 · 줄 사이 구분선 */
+  --color-badge-bg: #eaeef3;
+  --color-divider: #e1e6ed;
+  --color-progress-fill: #00cba8;
+  --color-calendar-today-bg: #0f7a9c;
+  --color-calendar-today-fg: #ffffff;
+  --color-calendar-holiday: #bc3942;
+  --color-calendar-saturday: #3c5ea8;
+  --color-ai-tint: #d9f7f2;
+  --color-ai-tint-soft: #d9f7f299;
+  --color-ai-accent-start: #00cba8;
+  --color-ai-accent-end: #2aa7df;
+  --color-ai-accent-violet: #a18bfa;
+  --color-ai-gradient-start: #1488ab;
+  --color-ai-gradient-mid: #3487c3;
+  --color-ai-gradient-end: #6f86f0;
+  --color-ai-gradient-hover-start: #127896;
+  --color-ai-gradient-hover-mid: #2e77ab;
+  --color-ai-gradient-hover-end: #6276d3;
+  --color-ai-gradient-pressed-start: #0f6782;
+  --color-ai-gradient-pressed-mid: #276794;
+  --color-ai-gradient-pressed-end: #5466b6;
+  --color-mood-mint: #ddf7f1;
+  --color-mood-sky: #e2f0fc;
+  --color-mood-lavender: #efeafd;
+  --color-glass-bg: #ffffffe0;
+  --color-glass-border: #1218200d;
+  --color-glass-shadow: #1218201f;
+  --color-glass-shadow-soft: #1218200f;
+  --color-brand-logo: #0b4f65;
+  --color-brand-logo-base: #0b4f65;
+  --color-brand-logo-accent: #4a90e2;
+  --color-neutral-400: #c3cad3;
+
+  /* ── 목표 색 21종 (bg 연한 바탕 · fg 글자 · accent 선/점) — 서버 hex 는 lib/goalTone.ts 가 가장 가까운 색으로 맞춰요 ── */
+  --color-goal-coral-bg: #fdecec;
+  --color-goal-coral-fg: #9d4b4b;
+  --color-goal-coral-accent: #f27474;
+  --color-goal-orange-bg: #fef0e7;
+  --color-goal-orange-fg: #935730;
+  --color-goal-orange-accent: #f59150;
+  --color-goal-amber-bg: #fef5e3;
+  --color-goal-amber-fg: #876420;
+  --color-goal-amber-accent: #f5b63a;
+  --color-goal-yellow-bg: #fefae8;
+  --color-goal-yellow-fg: #7b6e2f;
+  --color-goal-yellow-accent: #f5dc5e;
+  --color-goal-lime-bg: #f2fae8;
+  --color-goal-lime-fg: #526d2f;
+  --color-goal-lime-accent: #a3d95e;
+  --color-goal-green-bg: #e6f7ed;
+  --color-goal-green-fg: #2d764a;
+  --color-goal-green-accent: #4bc47c;
+  --color-goal-mint-bg: #e0f7f3;
+  --color-goal-mint-fg: #137664;
+  --color-goal-mint-accent: #1fc4a6;
+  --color-goal-sky-bg: #e4f6fc;
+  --color-goal-sky-fg: #25738a;
+  --color-goal-sky-accent: #3dbfe6;
+  --color-goal-blue-bg: #e7eefd;
+  --color-goal-blue-fg: #3c5ea8;
+  --color-goal-blue-accent: #5586f0;
+  --color-goal-purple-bg: #eeeafd;
+  --color-goal-purple-fg: #5c49a8;
+  --color-goal-purple-accent: #8468f0;
+  --color-goal-violet-bg: #f5ebfc;
+  --color-goal-violet-fg: #7f51a2;
+  --color-goal-violet-accent: #b573e8;
+  --color-goal-pink-bg: #fdeffa;
+  --color-goal-pink-fg: #915383;
+  --color-goal-pink-accent: #f28bdb;
+  --color-goal-rose-bg: #fdebf1;
+  --color-goal-rose-fg: #9c4967;
+  --color-goal-rose-accent: #f0709e;
+  --color-goal-teal-bg: #e2f5f7;
+  --color-goal-teal-fg: #1b7078;
+  --color-goal-teal-accent: #2dbbc8;
+  --color-goal-slate-bg: #eaeef1;
+  --color-goal-slate-fg: #4a5c6b;
+  --color-goal-slate-accent: #6a8499;
+  --color-goal-brown-bg: #f4efea;
+  --color-goal-brown-fg: #7b6147;
+  --color-goal-brown-accent: #b08a66;
+  --color-goal-sand-bg: #f8f5ef;
+  --color-goal-sand-fg: #71654c;
+  --color-goal-sand-accent: #cdb88b;
+  --color-goal-sage-bg: #eff4f0;
+  --color-goal-sage-fg: #56685a;
+  --color-goal-sage-accent: #8fae96;
+  --color-goal-navy-bg: #e6e9f3;
+  --color-goal-navy-fg: #374576;
+  --color-goal-navy-accent: #4f63a8;
+  --color-goal-plum-bg: #f2eaf1;
+  --color-goal-plum-fg: #744c6d;
+  --color-goal-plum-accent: #a56c9c;
+  --color-goal-neutral-bg: var(--color-bg-subtle);
+  --color-goal-neutral-fg: var(--color-text-secondary);
+  --color-goal-neutral-accent: var(--color-text-tertiary);
+
+  /* ── 모서리 ── */
+  --radius-card: 16px;
+  --radius-dialog: 16px;
+  --radius-btn: 12px;
+  --radius-btn-sm: 10px;
+  --radius-input: 10px;
+  --radius-chip: 8px;
+  --radius-chip-sm: 6px;
+  --radius-event: 8px;
+  --radius-event-fixed: 10px;
+  --radius-nav: 8px;
+  --radius-icon-btn: 6px;
+  --radius-toast: 12px;
+  --radius-seg: 12px;
+  --radius-seg-item: 9px;
+  --radius-checkbox: 6px;
+  --radius-quick-reply: 20px;
+  --radius-composer: 26px;
+  --radius-sheet: 24px;
+
+  /* ── 그림자 ── */
+  --shadow-card: 0 4px 16px rgb(18 24 32 / 0.06);
+  --shadow-pop: 0 12px 40px rgb(18 24 32 / 0.12);
+  --shadow-primary: 0 4px 12px rgb(8 127 142 / 0.25);
+  --shadow-danger: 0 4px 12px rgb(209 63 73 / 0.22);
+  --shadow-seg: 0 1px 3px rgb(0 0 0 / 0.08);
+  --shadow-glass: 0 4px 16px rgb(18 24 32 / 0.05);
+
+  /* ── 글자 스타일 (Pretendard · 자간 -2%) — text-display-xl · text-h1 · text-body-md · text-label-sm … ── */
+  --text-display-xl: 32px;
+  --text-display-xl--line-height: 1.3;
+  --text-display-xl--font-weight: 700;
+  --text-display-xl--letter-spacing: -0.02em;
+  --text-display-lg: 28px;
+  --text-display-lg--line-height: 1.3;
+  --text-display-lg--font-weight: 700;
+  --text-display-lg--letter-spacing: -0.02em;
+  --text-h1: 24px;
+  --text-h1--line-height: 1.4;
+  --text-h1--font-weight: 600;
+  --text-h1--letter-spacing: -0.02em;
+  --text-h2: 20px;
+  --text-h2--line-height: 1.4;
+  --text-h2--font-weight: 600;
+  --text-h2--letter-spacing: -0.02em;
+  --text-h3: 18px;
+  --text-h3--line-height: 1.4;
+  --text-h3--font-weight: 600;
+  --text-h3--letter-spacing: -0.02em;
+  --text-h4: 16px;
+  --text-h4--line-height: 1.5;
+  --text-h4--font-weight: 600;
+  --text-h4--letter-spacing: -0.02em;
+  --text-body-lg: 16px;
+  --text-body-lg--line-height: 1.5;
+  --text-body-lg--font-weight: 400;
+  --text-body-lg--letter-spacing: -0.02em;
+  --text-body-md: 14px;
+  --text-body-md--line-height: 1.32;
+  --text-body-md--font-weight: 400;
+  --text-body-md--letter-spacing: -0.02em;
+  --text-body-sm: 13px;
+  --text-body-sm--line-height: 1.32;
+  --text-body-sm--font-weight: 400;
+  --text-body-sm--letter-spacing: -0.02em;
+  --text-label-lg: 14px;
+  --text-label-lg--line-height: 1.4;
+  --text-label-lg--font-weight: 600;
+  --text-label-lg--letter-spacing: -0.02em;
+  --text-label-md: 13px;
+  --text-label-md--line-height: 1.4;
+  --text-label-md--font-weight: 600;
+  --text-label-md--letter-spacing: -0.02em;
+  --text-label-sm: 12px;
+  --text-label-sm--line-height: 1.3;
+  --text-label-sm--font-weight: 600;
+  --text-label-sm--letter-spacing: -0.02em;
+  --text-label-xs: 11px;
+  --text-label-xs--line-height: 1.3;
+  --text-label-xs--font-weight: 500;
+  --text-label-xs--letter-spacing: -0.02em;
+  --text-label-2xs: 9px;
+  --text-label-2xs--line-height: 1.0;
+  --text-label-2xs--font-weight: 500;
+  --text-label-2xs--letter-spacing: -0.02em;
+  --text-caption-md: 12px;
+  --text-caption-md--line-height: 1.32;
+  --text-caption-md--font-weight: 400;
+  --text-caption-md--letter-spacing: -0.02em;
+  --text-caption-sm: 11px;
+  --text-caption-sm--line-height: 1.32;
+  --text-caption-sm--font-weight: 400;
+  --text-caption-sm--letter-spacing: -0.02em;
+  --text-input: 14px;
+  --text-input--line-height: 1.32;
+  --text-input--font-weight: 500;
+  --text-input--letter-spacing: -0.02em;
+}
+
+/*
+ * 다크 모드 — <html data-theme="dark"> 일 때 토큰 값만 바꿔요.
+ * 화면 코드는 bg-surface · text-ink 같은 토큰 클래스를 쓰니 그대로 따라 바뀌어요.
+ * data-theme 은 layout.tsx 의 THEME_SCRIPT 가 첫 화면을 그리기 전에 정해요 (설정: 시스템 / 라이트 / 다크).
+ */
+:root {
+  color-scheme: light;
+  /*
+   * AI 그라데이션 (명세 6) — 115° · 0 / 65 / 100%. 색 변수가 다크 모드에서 바뀌니 여기 한 번만 정의하면 둘 다 따라가요.
+   * 쓰는 법: bg-ai-gradient (+ hover:bg-ai-gradient-hover · active:bg-ai-gradient-pressed) · ai-border · <AIBadge>
+   */
+  --gradient-ai: linear-gradient(
+    115deg,
+    var(--color-ai-gradient-start) 0%,
+    var(--color-ai-gradient-mid) 65%,
+    var(--color-ai-gradient-end) 100%
+  );
+  --gradient-ai-hover: linear-gradient(
+    115deg,
+    var(--color-ai-gradient-hover-start) 0%,
+    var(--color-ai-gradient-hover-mid) 65%,
+    var(--color-ai-gradient-hover-end) 100%
+  );
+  --gradient-ai-pressed: linear-gradient(
+    115deg,
+    var(--color-ai-gradient-pressed-start) 0%,
+    var(--color-ai-gradient-pressed-mid) 65%,
+    var(--color-ai-gradient-pressed-end) 100%
+  );
+  /* 서버 hex 가 팔레트와 멀 때 만드는 색 (lib/goalTone.ts) — 바탕 섞는 비율 · 글자 어둡게 */
+  --goal-tint: 12%;
+  --goal-fg-keep: 55%;
+  --goal-fg-base: #000000;
+}
+:root[data-theme='dark'] {
+  color-scheme: dark; /* 날짜 선택기 · 스크롤바 같은 기본 UI 도 어둡게 */
+
+  /* ── 기존 토큰 (이름 유지 · 새 값으로 다시 연결 — web/iOS/Android 공통 매핑표) ── */
+  --color-ink: #f2f5f9;
+  --color-ink-2: #a3aebd;
+  --color-ink-3: #7d8898;
+  --color-ink-4: #566273;
+  --color-canvas: #121820;
+  --color-surface: #1c232c;
+  --color-subtle: #252d38;
+  --color-line: #2f3845;
+  --color-line-strong: #3f4a5a;
+  --color-brand: #167a9c;
+  --color-brand-strong: #126b88;
+  --color-brand-soft: #2b3646;
+  --color-success: #8ed6aa;
+  --color-success-soft: #334745;
+  --color-warning: #f6c158;
+  --color-warning-soft: #45443b;
+  --color-danger: #e2888e;
+  --color-danger-soft: #443740;
+  --color-on-ink: #121820;
+  --color-inverse: #f2f5f9;
+  --color-warning-ink: #e8c878;
+  --color-warning-ink-strong: #f0d89a;
+  --color-hatch: #1a2129;
+  --color-hatch-line: #2a323d;
+  --color-sleep: #1a2129;
+  --color-sleep-line: #2a323d;
+  --color-sleep-ink: #a3aebd;
+  --color-heat-1: #1a3540;
+  --color-heat-2: #1f4f60;
+  --color-heat-3: #22708a;
+  --color-heat-4: #2a93b5;
+  --color-heat-5: #6fb1cf;
+
+  /* ── 새 시맨틱 토큰 (Figma Component_ver.2 · Semantic Color) ── */
+  --color-bg-canvas: #121820;
+  --color-bg-page: var(--color-bg-canvas);
+  --color-bg-surface: #1c232c;
+  --color-bg-elevated: #252d38;
+  --color-bg-subtle: #252d38;
+  --color-bg-sunken: #121820;
+  --color-bg-inverse: #f2f5f9;
+  --color-bg-overlay: #00000099;
+  --color-text-primary: #f2f5f9;
+  --color-text-secondary: #a3aebd;
+  --color-text-tertiary: #7d8898;
+  --color-text-placeholder: #7d8898;
+  --color-text-brand: #a3d2e8;
+  --color-text-inverse: #121820;
+  --color-border-subtle: #2f3845;
+  --color-border-soft: #2f3845b2;
+  --color-border-control: #7d8898;
+  --color-border-focus: #6fb1cf;
+  --color-action-primary-bg: #167a9c;
+  --color-action-primary-bg-hover: #126b88;
+  --color-action-primary-bg-pressed: #0e5b75;
+  --color-action-primary-fg: #ffffff;
+  --color-action-secondary-bg: #2b3646;
+  --color-action-secondary-bg-hover: #354258;
+  --color-action-secondary-bg-pressed: #3f4d63;
+  --color-action-secondary-fg: #f2f5f9;
+  --color-action-secondary-border: #3f4a5a;
+  --color-action-outline-border: #6fb1cf;
+  --color-action-ghost-hover: #252d38;
+  --color-action-ghost-pressed: #2f3845;
+  --color-action-danger-bg: #a33139;
+  --color-action-danger-bg-hover: #ac464d;
+  --color-action-danger-bg-pressed: #8b2a30;
+  --color-action-danger-fg: #ffffff;
+  --color-disabled-bg: #252d38;
+  --color-disabled-fg: #566273;
+  --color-selection-bg: #2f3845;
+  --color-selection-fg: #f2f5f9;
+  --color-status-success-bg: #334745;
+  --color-status-success-fg: #8ed6aa;
+  --color-status-warning-bg: #45443b;
+  --color-status-warning-fg: #e8c878;
+  --color-status-error-bg: #443740;
+  --color-status-error-fg: #e2888e;
+  --color-status-info-bg: #252d38;
+  --color-status-info-fg: #a3aebd;
+  --color-accent-mint: #00cba8;
+  --color-accent-on-mint: #121820;
+  --color-progress-track: #22343d;
+  --color-heat-empty: #252d38;
+  --color-badge-bg: #2f3845;
+  --color-divider: #2f3845;
+  --color-progress-fill: #00cba8;
+  --color-calendar-today-bg: #167a9c;
+  --color-calendar-today-fg: #ffffff;
+  --color-calendar-holiday: #e2888e;
+  --color-calendar-saturday: #6f98f2;
+  --color-ai-tint: #1c2b3d;
+  --color-ai-tint-soft: #1c2b3d99;
+  --color-ai-accent-start: #00cba8;
+  --color-ai-accent-end: #2aa7df;
+  --color-ai-accent-violet: #a18bfa;
+  --color-ai-gradient-start: #2aa0c6;
+  --color-ai-gradient-mid: #4d92dc;
+  --color-ai-gradient-end: #8ea3ff;
+  --color-ai-gradient-hover-start: #3bb0d4;
+  --color-ai-gradient-hover-mid: #62a2e6;
+  --color-ai-gradient-hover-end: #a2b4ff;
+  --color-ai-gradient-pressed-start: #1f86aa;
+  --color-ai-gradient-pressed-mid: #3d7fc4;
+  --color-ai-gradient-pressed-end: #7a8fe8;
+  --color-mood-mint: #16302d;
+  --color-mood-sky: #172a3b;
+  --color-mood-lavender: #25213d;
+  --color-glass-bg: #141d29e5;
+  --color-glass-border: #ffffff24;
+  --color-glass-shadow: #00000080;
+  --color-glass-shadow-soft: #0000004d;
+  --color-brand-logo: #7fcbe6;
+  --color-brand-logo-base: #7fcbe6;
+  --color-brand-logo-accent: #5f9cf5;
+  --color-neutral-400: #566273;
+
+  /* 목표 색 21종 */
+  --color-goal-coral-bg: #47373f;
+  --color-goal-coral-fg: #facaca;
+  --color-goal-coral-accent: #f48989;
+  --color-goal-orange-bg: #483c38;
+  --color-goal-orange-fg: #fbd5bc;
+  --color-goal-orange-accent: #f6a16a;
+  --color-goal-amber-bg: #484335;
+  --color-goal-amber-fg: #fbe3b4;
+  --color-goal-amber-accent: #f6c158;
+  --color-goal-yellow-bg: #48493b;
+  --color-goal-yellow-fg: #fbf2c1;
+  --color-goal-yellow-accent: #f6e176;
+  --color-goal-lime-bg: #3a493b;
+  --color-goal-lime-fg: #dcf0c1;
+  --color-goal-lime-accent: #b1df76;
+  --color-goal-green-bg: #2b4540;
+  --color-goal-green-fg: #bae8cd;
+  --color-goal-green-accent: #66cd90;
+  --color-goal-mint-bg: #234547;
+  --color-goal-mint-fg: #a9e8dd;
+  --color-goal-mint-accent: #41cdb3;
+  --color-goal-sky-bg: #284452;
+  --color-goal-sky-fg: #b5e7f5;
+  --color-goal-sky-accent: #5ac9ea;
+  --color-goal-blue-bg: #2d3a54;
+  --color-goal-blue-fg: #bed1f9;
+  --color-goal-blue-accent: #6f98f2;
+  --color-goal-purple-bg: #343554;
+  --color-goal-purple-fg: #d0c5f9;
+  --color-goal-purple-accent: #967ff2;
+  --color-goal-violet-bg: #3d3752;
+  --color-goal-violet-fg: #e3c9f6;
+  --color-goal-violet-accent: #c088eb;
+  --color-goal-pink-bg: #473b50;
+  --color-goal-pink-fg: #fad3f1;
+  --color-goal-pink-accent: #f49ce0;
+  --color-goal-rose-bg: #473746;
+  --color-goal-rose-fg: #f9c8da;
+  --color-goal-rose-accent: #f285ad;
+  --color-goal-teal-bg: #26434d;
+  --color-goal-teal-fg: #afe5ea;
+  --color-goal-teal-accent: #4dc5d0;
+  --color-goal-slate-bg: #303a45;
+  --color-goal-slate-fg: #c6d0d8;
+  --color-goal-slate-accent: #8096a8;
+  --color-goal-brown-bg: #3c3b3c;
+  --color-goal-brown-fg: #e1d2c4;
+  --color-goal-brown-accent: #bc9c7d;
+  --color-goal-sand-bg: #414342;
+  --color-goal-sand-fg: #ece4d3;
+  --color-goal-sand-accent: #d4c39c;
+  --color-goal-sage-bg: #364144;
+  --color-goal-sage-fg: #d4e0d7;
+  --color-goal-sage-accent: #a0baa6;
+  --color-goal-navy-bg: #2b3447;
+  --color-goal-navy-fg: #bcc3de;
+  --color-goal-navy-accent: #697ab5;
+  --color-goal-plum-bg: #3a3645;
+  --color-goal-plum-fg: #ddc7d9;
+  --color-goal-plum-accent: #b282ab;
+
+  --shadow-card: 0 4px 16px rgb(0 0 0 / 0.3);
+  --shadow-pop: 0 12px 40px rgb(0 0 0 / 0.5);
+  --shadow-primary: 0 4px 12px rgb(0 0 0 / 0.35);
+  --shadow-danger: 0 4px 12px rgb(0 0 0 / 0.35);
+  --shadow-seg: 0 1px 3px rgb(0 0 0 / 0.3);
+  --shadow-glass: 0 4px 16px rgb(0 0 0 / 0.3);
+
+  /* 서버 hex 가 팔레트와 멀 때 만드는 색 (lib/goalTone.ts) */
+  --goal-tint: 22%;
+  --goal-fg-keep: 40%;
+  --goal-fg-base: #ffffff;
+}
+
+/*
+ * 그림자 유틸리티(shadow-card 등)는 Tailwind 가 값을 클래스 안에 바로 넣어서 위 변수 덮어쓰기가 안 먹어요
+ * → 다크 모드에서는 그림자 색만 바꿔 줘요 (hover:shadow-pop 같은 변형 포함)
+ */
+:root[data-theme='dark'] :is([class*='shadow-card'], [class*='shadow-glass'], [class*='shadow-seg']) {
+  --tw-shadow-color: rgb(0 0 0 / 0.3);
+}
+:root[data-theme='dark'] [class*='shadow-pop'] {
+  --tw-shadow-color: rgb(0 0 0 / 0.5);
+}
+:root[data-theme='dark'] :is([class*='shadow-primary'], [class*='shadow-danger']) {
+  --tw-shadow-color: rgb(0 0 0 / 0.35);
+}
+
+/*
+ * Figma 에 없어 lucide-react 로 남은 아이콘도 같은 선 굵기 규칙으로 (명세 3: 14·16px = 1.25 · 18px 이상 = 1.5, 화면 px)
+ * — non-scaling-stroke 로 viewBox 와 상관없이 화면 px 로 그려요. Figma 아이콘(components/icons)은 Icon 이 직접 계산해요.
+ */
+svg.lucide {
+  stroke-width: 1.5px;
+}
+svg.lucide :is(path, line, circle, rect, polyline, polygon, ellipse) {
+  vector-effect: non-scaling-stroke;
+}
+svg.lucide:is(.size-3, .size-3\.5, .size-4, .size-2\.5) {
+  stroke-width: 1.25px;
+}
+
+/* 모바일 탭바(MobileTabBar) 높이 — 본문 여백 · 아래 떠 있는 바 · 토스트가 이만큼 비켜요 (탭바 없는 화면 · lg 이상은 0) */
+:root {
+  --tabbar-h: 0px;
+}
+:root:has([data-mobile-tabbar]) {
+  --tabbar-h: calc(66px + env(safe-area-inset-bottom));
+}
+@media (width >= 64rem) {
+  :root:has([data-mobile-tabbar]) {
+    --tabbar-h: 0px;
+  }
+}
+
+/* 목표 상세 카드 그림자는 더 연하게 (명세 12.3) */
+.goal-detail [class*='shadow-card'] {
+  --tw-shadow: 0 2px 8px var(--tw-shadow-color, rgb(18 24 32 / 0.04));
+}
+:root[data-theme='dark'] .goal-detail [class*='shadow-card'] {
+  --tw-shadow-color: rgb(0 0 0 / 0.25);
+}
+
+/* Tailwind dark: 변형 (dark:bg-…) 도 같은 기준으로 */
+@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
+
+/* ── AI 처리 (명세 6) ── */
+/* 가로로 넘치는 탭 줄 등 — 스크롤은 되고 스크롤바만 숨겨요 (큰 화면에서 탭 줄 오른쪽에 막대가 생기던 문제, 2026-10-24) */
+@utility scrollbar-none {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@utility bg-ai-gradient {
+  background-image: var(--gradient-ai);
+}
+@utility bg-ai-gradient-hover {
+  background-image: var(--gradient-ai-hover);
+}
+@utility bg-ai-gradient-pressed {
+  background-image: var(--gradient-ai-pressed);
+}
+/* 글자에 그라데이션 (AI 제목 강조 등) */
+@utility text-ai-gradient {
+  background-image: var(--gradient-ai);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+/*
+ * AI 결과 상자 — 1.5px 안쪽 그라데이션 테두리 (padding-box / border-box 트릭).
+ * 바탕은 --ai-border-fill (기본 bg/surface, 불투명이어야 테두리 그라데이션이 비치지 않아요). 모서리는 rounded-card 등으로.
+ */
+@utility ai-border {
+  border: 1.5px solid transparent;
+  background:
+    linear-gradient(var(--ai-border-fill, var(--color-bg-surface)), var(--ai-border-fill, var(--color-bg-surface)))
+      padding-box,
+    var(--gradient-ai) border-box;
+  box-shadow:
+    0 12px 36px rgb(0 0 0 / 0.08),
+    0 2px 8px rgb(0 0 0 / 0.04);
+}
+/* AI 분석 카드 — ai/tint-soft 바탕(= ai/tint 60% 를 surface 위에, 불투명) + 그라데이션 테두리. ai-border · ai-border-flat 와 같이 써요 */
+@utility ai-card {
+  --ai-border-fill: color-mix(in srgb, var(--color-ai-tint) 60%, var(--color-bg-surface));
+}
+/* 그림자 없는 AI 테두리 (카드 안 · 목록 안처럼 떠 있지 않은 곳) */
+@utility ai-border-flat {
+  border: 1.5px solid transparent;
+  background:
+    linear-gradient(var(--ai-border-fill, var(--color-bg-surface)), var(--ai-border-fill, var(--color-bg-surface)))
+      padding-box,
+    var(--gradient-ai) border-box;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    @apply bg-canvas text-ink font-sans antialiased;
+    letter-spacing: -0.02em;
+    word-break: keep-all; /* 한글이 단어 중간에서 줄바꿈되지 않게 */
+    overflow-wrap: anywhere; /* 아주 긴 영문/URL 은 넘치지 않게 */
+  }
+  :focus-visible {
+    @apply outline-border-focus outline-2 outline-offset-2;
+  }
+}
+
+/*
+ * 모션 (2026-10) — "슝" 하고 들어오지만 과하지 않게.
+ *  - 들어올 때 220~320ms, 살짝 튕기는 스프링 · 나갈 때 150ms 로 빠르게
+ *  - 움직임 줄이기(prefers-reduced-motion)를 켠 사람에게는 거의 멈춰 있어요 (맨 아래)
+ */
+:root {
+  --ease-spring: cubic-bezier(0.34, 1.36, 0.64, 1);
+  --ease-out-expo: cubic-bezier(0.22, 1, 0.36, 1);
+}
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+/* 가운데 모달 · 떠 있는 확인 바 */
+@keyframes modal-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+@keyframes modal-out {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(10px) scale(0.97);
+  }
+}
+/* 모바일 아래 시트 */
+@keyframes sheet-in {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+@keyframes sheet-out {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(100%);
+  }
+}
+/* 블록 옆 팝오버 · 메뉴 — 누른 자리에서 톡 */
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+/* 메뉴 항목이 차례로 */
+@keyframes menu-item-in {
+  from {
+    opacity: 0;
+    transform: translateX(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+/* 오른쪽 Task 추가 패널 */
+@keyframes panel-in {
+  from {
+    opacity: 0;
+    transform: translateX(64px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+/* 목표별 실천 시간 막대 · 말풍선 */
+@keyframes bar-grow {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+@keyframes tip-in {
+  from {
+    opacity: 0;
+    transform: translate(var(--tip-x, -50%), 4px) scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: translate(var(--tip-x, -50%), 0) scale(1);
+  }
+}
+@keyframes fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(48px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* 움직임 줄이기를 켠 사람 — 애니메이션 · 전환을 거의 없애요 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 1ms !important;
+    animation-delay: 0ms !important;
+    transition-duration: 1ms !important;
+  }
+}

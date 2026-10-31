@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: 📚 백엔드 문서
+    url: https://stone-mochi-94c.notion.site/3d82f23b094f803ba0ffca8a13915c80
+    about: API 스펙 및 도메인 구조 문서를 참고하세요.

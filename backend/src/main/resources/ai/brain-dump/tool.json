@@ -1,0 +1,52 @@
+{
+  "name": "submit_brain_dump",
+  "description": "Brain dump 로 받은 할 일들을 해석하고 목표에 연결한 결과를 제출한다. 모든 응답은 반드시 이 도구로만 한다.",
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "items": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "clientKey": { "type": "string", "description": "입력 줄의 clientKey 그대로" },
+            "title": { "type": "string" },
+            "dateType": { "type": "string", "enum": ["ON", "DUE"] },
+            "date": { "type": "string", "description": "yyyy-MM-dd" },
+            "startTime": { "type": ["string", "null"], "description": "HH:mm" },
+            "endTime": { "type": ["string", "null"], "description": "HH:mm" },
+            "estimatedMinutes": { "type": "integer" },
+            "priority": { "type": "string", "enum": ["A", "B", "C", "D", "E"] },
+            "kind": { "type": "string", "enum": ["NORMAL", "APPOINTMENT"] },
+            "goal": {
+              "type": "object",
+              "properties": {
+                "type": { "type": "string", "enum": ["EXISTING", "TEMP"] },
+                "goalCategoryId": { "type": ["integer", "null"] },
+                "generalCategoryId": { "type": ["integer", "null"] },
+                "milestoneId": { "type": ["integer", "null"] },
+                "tempKey": { "type": ["string", "null"] },
+                "reason": { "type": "string" }
+              },
+              "required": ["type", "reason"]
+            }
+          },
+          "required": ["clientKey", "title", "dateType", "date", "estimatedMinutes", "priority", "kind", "goal"]
+        }
+      },
+      "tempGoals": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "tempKey": { "type": "string" },
+            "name": { "type": "string" },
+            "emoji": { "type": "string" }
+          },
+          "required": ["tempKey", "name", "emoji"]
+        }
+      }
+    },
+    "required": ["items", "tempGoals"]
+  }
+}
