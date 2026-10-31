@@ -57,17 +57,19 @@
 
 테스트 서버와 운영 서버를 **브랜치 단위로 완전히 분리**했습니다.
 기능은 먼저 `develop`에서 테스트 서버로 검증하고, 문제가 없을 때만 `main`으로 머지해 운영에 반영합니다.
+두 환경 모두 **테스트 코드가 전부 통과해야만 배포**되고, 하나라도 실패하면 배포가 중단됩니다.
 
 ```
-feature/* ──PR──▶ develop ──(자동 배포)──▶ 테스트 서버  dev-api.naleul.com
+feature/* ──PR──▶ develop ──(테스트 통과 → 자동 배포)──▶ 테스트 서버  dev-api.naleul.com
                      │
-                     └──merge──▶ main ──(자동 배포)──▶ 운영 서버  api.naleul.com
+                     └──merge──▶ main ──(테스트 통과 → 자동 배포)──▶ 운영 서버  api.naleul.com
 ```
 
 | | `develop` (테스트 · 내부) | `main` (운영 · 외부) |
 |---|---|---|
 | 워크플로 | `.github/workflows/deploy-dev.yml` | `.github/workflows/deploy.yml` |
 | 트리거 | `develop` push + 수동 실행(`workflow_dispatch`) | `main` push |
+| 테스트 게이트 | `./gradlew test` 통과 시에만 배포, 실패 시 리포트 업로드 | `./gradlew test` 통과 시에만 배포, 실패 시 리포트 업로드 |
 | 서버 | 테스트 EC2 (`dev-api.naleul.com`) | 운영 EC2 (`api.naleul.com`) |
 | 배포 방식 | 단일 인스턴스 재시작 (`systemctl restart naleul-dev`) | **Blue-Green 무중단 배포** |
 | 연속 push | `concurrency`로 이전 배포 취소, 마지막 커밋만 배포 | 순차 배포 |
@@ -78,11 +80,12 @@ feature/* ──PR──▶ develop ──(자동 배포)──▶ 테스트 서
 
 ### 테스트 서버 배포 흐름 (`deploy-dev.yml`)
 
-1. JDK 21로 `bootJar` 빌드 (테스트 생략, Gradle 캐시 사용)
-2. jar를 `naleul.jar`로 이름을 고정해 테스트 EC2의 `incoming/` 폴더로 전송
-3. **실행 중인 jar를 덮어쓰지 않고** `mv`로 교체 → 실행 중 프로세스 보호
-4. `systemctl restart naleul-dev`
-5. 5초 간격으로 API를 호출해 `200 / 401 / 403` 응답이 오면 구동 완료로 판단
+1. JDK 21로 **테스트 실행** → 실패하면 테스트 리포트를 Actions 아티팩트로 올리고 배포 중단
+2. 테스트 통과 시 `bootJar` 빌드 (Gradle 캐시 사용)
+3. jar를 `naleul.jar`로 이름을 고정해 테스트 EC2의 `incoming/` 폴더로 전송
+4. **실행 중인 jar를 덮어쓰지 않고** `mv`로 교체 → 실행 중 프로세스 보호
+5. `systemctl restart naleul-dev`
+6. 5초 간격으로 API를 호출해 `200 / 401 / 403` 응답이 오면 구동 완료로 판단
 
 ### 왜 나눴나
 
@@ -104,12 +107,13 @@ feature/* ──PR──▶ develop ──(자동 배포)──▶ 테스트 서
 
 **배포 흐름** (`deploy.yml` → `deploy-bluegreen.sh`)
 
-1. GitHub Actions에서 빌드한 jar를 운영 EC2로 전송
-2. 쉬고 있는 포트에 새 버전 기동
-3. 헬스체크 통과 확인 (최대 60초)
-4. nginx upstream을 새 포트로 바꾸고 `nginx reload` → 무중단 전환
-5. 이전 포트 프로세스 종료
-6. 최신 3개를 넘는 오래된 jar 정리
+1. GitHub Actions에서 **테스트 실행** → 실패하면 운영 배포 중단
+2. 테스트 통과 시 빌드한 jar를 운영 EC2로 전송
+3. 쉬고 있는 포트에 새 버전 기동
+4. 헬스체크 통과 확인 (최대 60초)
+5. nginx upstream을 새 포트로 바꾸고 `nginx reload` → 무중단 전환
+6. 이전 포트 프로세스 종료
+7. 최신 3개를 넘는 오래된 jar 정리
 
 **nginx 라우팅**
 
@@ -223,6 +227,12 @@ feature/* ──PR──▶ develop ──(자동 배포)──▶ 테스트 서
 # 테스트 (H2 인메모리, application-test.yml)
 ./gradlew test
 ```
+
+**테스트 구성**
+
+- 테스트 클래스 114개. 도메인 서비스 · 정책 · AI 응답 검증(validator · sanitizer) 등은 JUnit 5 + Mockito 단위 테스트로 작성했습니다.
+- GitHub Actions(`CI=true`)에서는 단위 테스트 전체를 실행하고, 비밀값 설정이 필요한 전체 컨텍스트 로딩 테스트(`NaleulApplicationTests`)만 제외합니다. 로컬에서는 전부 실행됩니다.
+- 실제 Claude API를 호출하는 테스트(`ClaudeGoalAiLiveTest`)는 `ANTHROPIC_API_KEY`가 있을 때만 실행됩니다. 비용이 드는 호출이 CI에서 자동으로 돌지 않게 하려는 장치예요.
 
 > `*.yml`, `firebase-service-account.json`, `.env`는 모두 gitignore 대상입니다. 비밀값은 저장소에 커밋하지 않습니다.
 
